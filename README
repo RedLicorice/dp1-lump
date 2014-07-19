@@ -1,0 +1,19 @@
+README
+
+* Readline and Readexp
+
+Note that readline can return just the '\0' char.  It may happen that
+the readline get stuck and returns always repetetly if it can't read
+any more characters.
+
+
+* Bread functions
+
+* TCP server with argument passing signal handler
+
+* XDR - pay attention on allocating the data structure.  It's
+  generally not done by the library. It's the caller responsibility to
+  do so.
+
+* As a general rule: always use fgets instead of fscanf.
+  The former catches interupts, while the latter does not.

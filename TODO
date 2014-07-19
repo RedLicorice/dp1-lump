@@ -1,0 +1,10 @@
+TODO
+
+* readexp with argument passing char.
+
+* xdr
+  Add error checking functions (wrapper)
+
+* udp
+
+* iterative child tcp server
