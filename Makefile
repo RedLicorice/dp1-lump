@@ -25,13 +25,14 @@ server: copylunp
 	
 copylunp: clean
 	cp src/*.c test
-	cp src/*.h test
+	find src/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec cp \{} test/ \;
+	cp -n src/common.h test/common.h
 
 clean:
 	rm -f test/socket_client
 	rm -f test/socket_server
 	rm -f test/*.c
-	rm -f test/*.h
+	find test/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec rm \{} \;
 
 doxygen:
 	doxygen Doxyfile

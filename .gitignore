@@ -1,7 +1,5 @@
 cscope
 doxygen
-test/*.*
-test/client/client.c
-test/server/server.c
-test/socket_client
-test/socket_server
+test
+!test/client/client-empty.c
+!test/server/server-empty.c

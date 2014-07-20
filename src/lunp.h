@@ -554,9 +554,12 @@ typedef int SOCKET;
 enum bool_t { false = 0, true = 1 };
 typedef enum bool_t bool;
 
-#include "lunp_lg-socket.h"
+#define DEFAULT_CHUNK_SIZE 256
+
+#include "lunp_lg-other.h"
 #include "lunp_lg-tcp.h"
 #include "lunp_lg-udp.h"
+#include "lunp_lg-error.h"
 
 
 #endif	/* __unp_h */

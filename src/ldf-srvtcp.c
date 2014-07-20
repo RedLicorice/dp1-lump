@@ -1,7 +1,7 @@
 #include "lunp.h"
 #include "ldf-srv.h"
 
-int
+void
   tcpsrv_ocpc(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[], void (*child_task)(int))
   {
     int			listenfd, connfd;
@@ -38,7 +38,6 @@ int
 
       Close(connfd);			/* parent closes connected socket */
     }
-    return 0;
   }
   /*
     PAY ATTENTION. Killing pids[i] that are equals to -1 will provoke a SYSTEM CRASH.

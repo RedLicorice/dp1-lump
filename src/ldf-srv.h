@@ -15,7 +15,6 @@ static pid_t
 child_make(int i, int listenfd, int addrlen, void (*child_task)(int))
 {
   pid_t   pid;
-  void    child_main(int, int, int, void (*child_task)(int));
 
   if ( (pid = Fork()) > 0)
     return(pid);            /* parent */

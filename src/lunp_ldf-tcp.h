@@ -16,7 +16,7 @@ int tcpcli_simple(int argc, char *argv[], void (*client_task)(int));
  * -   the child executes `child_main' function
  * -   the father goes back to accept
  */
-int tcpsrv_ocpc(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[], void (*child_task)(int));
+void tcpsrv_ocpc(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[], void (*child_task)(int));
 
 /* 
  * usage: tcpsrv_ocpc_n [ <host> ] <port#>
