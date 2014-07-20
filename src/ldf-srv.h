@@ -1,6 +1,17 @@
-#include "srv.h"
+#ifndef __ldf_srv_h
+#define __ldf_srv_h
 
-pid_t
+static int       nchildren;
+static pid_t    *pids;
+
+/*
+ * usage: child_make(child_idx, listenfd, addrlen)
+ *  child_idx is not used by default (but may be useful)
+ */
+static pid_t child_make(int i, int listenfd, int addrlen, void (*child_task)(int));
+static void child_main(int i, int listenfd, int addrlen, void (*child_task)(int));
+
+static pid_t
 child_make(int i, int listenfd, int addrlen, void (*child_task)(int))
 {
   pid_t   pid;
@@ -12,10 +23,8 @@ child_make(int i, int listenfd, int addrlen, void (*child_task)(int))
   child_main(i, listenfd, addrlen, child_task);       /* never returns */
   return 0; /* just to shut down the debugger! */
 }
-/* end child_make */
 
-/* include child_main */
-void
+static void
 child_main(int i, int listenfd, int addrlen, void (*child_task)(int))
 {
   int              connfd;
@@ -35,4 +44,5 @@ child_main(int i, int listenfd, int addrlen, void (*child_task)(int))
   }
   return;
 }
-/* end child_main */
+
+#endif

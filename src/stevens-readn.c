@@ -1,7 +1,7 @@
-/* include readn */
 #include	"lunp.h"
 
-ssize_t						/* Read "n" bytes from a descriptor. */
+/** @brief Read @p n bytes from a descriptor. */
+ssize_t
 readn(int fd, void *vptr, size_t n)
 {
 	size_t	nleft;

@@ -1,6 +1,5 @@
-/*
- * Wrapper functions for our own library functions.
- * Most are included in the source file for the function itself.
+/** @brief Wrapper functions for our own library functions.
+ * @details Most are included in the source file for the function itself.
  */
 
 #include	"lunp.h"

@@ -1,17 +1,15 @@
-/* Not modified*/
-
 #include	"lunp.h"
 
 #include	<stdarg.h>		/* ANSI C header file */
 #include	<syslog.h>		/* for syslog() */
 
-int		daemon_proc;		/* set nonzero by daemon_init() */
+/** @brief set nonzero by daemon_init() */
+int		daemon_proc;
 
 static void	err_doit(int, int, const char *, va_list);
 
-/* Nonfatal error related to system call
- * Print message and return */
-
+/** @brief Nonfatal error related to system call
+ * @details Print message and return */
 void
 err_ret(const char *fmt, ...)
 {
@@ -23,9 +21,8 @@ err_ret(const char *fmt, ...)
 	return;
 }
 
-/* Fatal error related to system call
- * Print message and terminate */
-
+/** @brief Fatal error related to system call
+ * @details Print message and terminate */
 void
 err_sys(const char *fmt, ...)
 {
@@ -37,9 +34,8 @@ err_sys(const char *fmt, ...)
 	exit(1);
 }
 
-/* Fatal error related to system call
- * Print message, dump core, and terminate */
-
+/** @brief Fatal error related to system call
+ * @details Print message, dump core, and terminate */
 void
 err_dump(const char *fmt, ...)
 {
@@ -52,9 +48,8 @@ err_dump(const char *fmt, ...)
 	exit(1);		/* shouldn't get here */
 }
 
-/* Nonfatal error unrelated to system call
- * Print message and return */
-
+/** @brief Nonfatal error unrelated to system call
+ * @details Print message and return */
 void
 err_msg(const char *fmt, ...)
 {
@@ -66,9 +61,8 @@ err_msg(const char *fmt, ...)
 	return;
 }
 
-/* Fatal error unrelated to system call
- * Print message and terminate */
-
+/** @brief Fatal error unrelated to system call
+ * @details Print message and terminate */
 void
 err_quit(const char *fmt, ...)
 {
@@ -80,15 +74,13 @@ err_quit(const char *fmt, ...)
 	exit(1);
 }
 
-/* Print message and return to caller
- * Caller specifies "errnoflag" and "level" */
-
+/** @brief Print message and return to caller
+ * @details Caller specifies @p errnoflag and @p level */
 static void
 err_doit(int errnoflag, int level, const char *fmt, va_list ap)
 {
 	int		errno_save, n;
 	char	buf[MAXLINE + 1];
-
 
 	errno_save = errno;		/* value caller might want printed */
 #ifdef	HAVE_VSNPRINTF
@@ -102,7 +94,7 @@ err_doit(int errnoflag, int level, const char *fmt, va_list ap)
 	strcat(buf, "\n");
 
 	if (daemon_proc) {
-	        syslog(level, "Error - static msg (this has been changed in order not to generate warning / quick&dirty fixup sorry)");
+		syslog(level, "%s", buf);
 	} else {
 		fflush(stdout);		/* in case stdout and stderr are the same */
 		fputs(buf, stderr);

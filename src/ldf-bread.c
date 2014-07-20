@@ -1,5 +1,11 @@
-/* include readline */
 #include	"lunp.h"
+
+int     bread_init(bread_t **bread, int connfd);
+int     bread_free(bread_t **bread);
+ssize_t breadn(bread_t *bread, void *vptr, size_t n);
+ssize_t breadline(bread_t *bread, void *vptr, size_t maxlen);
+ssize_t breadexp(bread_t *bread, void *vptr, size_t maxlen);
+ssize_t breadlinebuf(bread_t *bread, void **vptrptr);
 
 int
 bread_init(bread_t **bread, int connfd){
@@ -154,7 +160,7 @@ ssize_t
 breadn(bread_t *bread, void *vptr, size_t n)
 {
   size_t	nleft;
-  ssize_t	nread;
+  //ssize_t	nread;
   char	*ptr;
   char	c;
   int rc;
@@ -170,7 +176,7 @@ breadn(bread_t *bread, void *vptr, size_t n)
     } else if (rc == 0) {
       break;
     } else{
-      nread = 0;
+      //nread = 0;
       return(-1);
     }
     

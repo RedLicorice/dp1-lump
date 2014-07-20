@@ -1,6 +1,4 @@
-/*
- * Standard I/O wrapper functions.
- */
+/** @brief Standard I/O wrapper functions. */
 
 #include	"lunp.h"
 

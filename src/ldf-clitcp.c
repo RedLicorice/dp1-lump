@@ -1,6 +1,4 @@
 #include "lunp.h"
-#include "srv.h"
-#include <sys/wait.h>
 
 int
 tcpcli_simple(int argc, char *argv[], void (*client_task)(int))

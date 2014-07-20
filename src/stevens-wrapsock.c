@@ -1,12 +1,31 @@
-#include "lunp.h"
+/** @file
+ * @brief Socket wrapper functions.
+ * @details These could all go into separate files, so only the ones needed cause the corresponding function to be added to the executable.  If sockets are a library (SVR4) this might make a difference (?), but if sockets are in the kernel (BSD) it doesn't matter. @n
+ * @n
+ * These wrapper functions also use the same prototypes as POSIX.1g, which might differ from many implementations (i.e., POSIX.1g specifies the fourth argument to getsockopt() as `void *`, not `char *`). @n
+ * @n
+ * If your system's headers are not correct [i.e., the Solaris 2.5 `<sys/socket.h>` omits the `const` from the second argument to both `bind()` and `connect()`], you'll get warnings of the form:@n
+ * ``warning: passing arg 2 of `bind' discards `const' from pointer target type`` @n
+ * ``warning: passing arg 2 of `connect' discards `const' from pointer target type``
+ */
+
+#include	"lunp.h"
 
 int
 Accept(int fd, struct sockaddr *sa, socklen_t *salenptr)
 {
-	int n;
+	int		n;
 
+again:
 	if ( (n = accept(fd, sa, salenptr)) < 0) {
-		err_sys("accept error");
+#ifdef	EPROTO
+		if (errno == EPROTO || errno == ECONNABORTED)
+#else
+		if (errno == ECONNABORTED)
+#endif
+			goto again;
+		else
+			err_sys("accept error");
 	}
 	return(n);
 }
@@ -46,7 +65,95 @@ Getsockopt(int fd, int level, int optname, void *optval, socklen_t *optlenptr)
 		err_sys("getsockopt error");
 }
 
-/* include Listen */
+#ifdef	HAVE_INET6_RTH_INIT
+int
+Inet6_rth_space(int type, int segments)
+{
+	int ret;
+	
+	ret = inet6_rth_space(type, segments);
+	if (ret < 0)
+		err_quit("inet6_rth_space error");
+
+	return ret;
+}
+
+void *
+Inet6_rth_init(void *rthbuf, socklen_t rthlen, int type, int segments)
+{
+	void *ret;
+
+	ret = inet6_rth_init(rthbuf, rthlen, type, segments);
+	if (ret == NULL)
+		err_quit("inet6_rth_init error");
+
+	return ret;
+}
+
+void
+Inet6_rth_add(void *rthbuf, const struct in6_addr *addr)
+{
+	if (inet6_rth_add(rthbuf, addr) < 0)
+		err_quit("inet6_rth_add error");
+}
+
+void
+Inet6_rth_reverse(const void *in, void *out)
+{
+	if (inet6_rth_reverse(in, out) < 0)
+		err_quit("inet6_rth_reverse error");
+}
+
+int
+Inet6_rth_segments(const void *rthbuf)
+{
+	int ret;
+
+	ret = inet6_rth_segments(rthbuf);
+	if (ret < 0)
+		err_quit("inet6_rth_segments error");
+
+	return ret;
+}
+
+struct in6_addr *
+Inet6_rth_getaddr(const void *rthbuf, int idx)
+{
+	struct in6_addr *ret;
+
+	ret = inet6_rth_getaddr(rthbuf, idx);
+	if (ret == NULL)
+		err_quit("inet6_rth_getaddr error");
+
+	return ret;
+}
+#endif
+
+#ifdef HAVE_KQUEUE
+int
+Kqueue(void)
+{
+	int ret;
+
+	if ((ret = kqueue()) < 0)
+		err_sys("kqueue error");
+	return ret;
+}
+
+int
+Kevent(int kq, const struct kevent *changelist, int nchanges,
+       struct kevent *eventlist, int nevents, const struct timespec *timeout)
+{
+	int ret;
+
+	if ((ret = kevent(kq, changelist, nchanges,
+					  eventlist, nevents, timeout)) < 0)
+		err_sys("kevent error");
+	return ret;
+}
+#endif
+
+
 void
 Listen(int fd, int backlog)
 {
@@ -59,8 +166,8 @@ Listen(int fd, int backlog)
 	if (listen(fd, backlog) < 0)
 		err_sys("listen error");
 }
-/* end Listen */
 
+#ifdef	HAVE_POLL
 int
 Poll(struct pollfd *fdarray, unsigned long nfds, int timeout)
 {
@@ -71,6 +178,7 @@ Poll(struct pollfd *fdarray, unsigned long nfds, int timeout)
 
 	return(n);
 }
+#endif
 
 ssize_t
 Recv(int fd, void *ptr, size_t nbytes, int flags)
@@ -167,7 +275,6 @@ Sockatmark(int fd)
 	return(n);
 }
 
-/* include Socket */
 int
 Socket(int family, int type, int protocol)
 {
@@ -177,7 +284,6 @@ Socket(int family, int type, int protocol)
 		err_sys("socket error");
 	return(n);
 }
-/* end Socket */
 
 void
 Socketpair(int family, int type, int protocol, int *fd)

@@ -1,10 +1,9 @@
-/* include tcp_connect */
 #include	"lunp.h"
 
 int
 tcp_connect(const char *host, const char *serv)
 {
-	int		sockfd, n;
+	int				sockfd, n;
 	struct addrinfo	hints, *res, *ressave;
 
 	bzero(&hints, sizeof(struct addrinfo));
@@ -36,12 +35,7 @@ tcp_connect(const char *host, const char *serv)
 }
 /* end tcp_connect */
 
-/*
- * We place the wrapper function here, not in wraplib.c, because some
- * XTI programs need to include wraplib.c, and it also defines
- * a Tcp_connect() function.
- */
-
+/** @details We place the wrapper function here, not in wraplib.c, because some XTI programs need to include wraplib.c, and it also defines a Tcp_connect() function. */
 int
 Tcp_connect(const char *host, const char *serv)
 {

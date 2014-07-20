@@ -1,8 +1,7 @@
-  #include "lunp.h"
-  #include "srv.h"
-  #include <sys/wait.h>
+#include "lunp.h"
+#include "ldf-srv.h"
 
-  int
+int
   tcpsrv_ocpc(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[], void (*child_task)(int))
   {
     int			listenfd, connfd;
@@ -46,7 +45,7 @@
     Handle it with very much caution.
     CAN NOT WAIT PROCESS gracefully with SIG_INT
    */
-  int
+int
   tcpsrv_ocpc_n(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[], void (*child_task)(int), int nchildren_max)
   {
     int			listenfd, connfd;
@@ -125,12 +124,12 @@
     free(pids_local);
   }
 
-  int
+int
   tcpsrv_pre(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[], void (*child_task)(int))
   {
     int             listenfd, i;
     socklen_t       addrlen;
-    pid_t           pid;
+    //pid_t           pid;
 
     if (argc == 3)
       listenfd = Tcp_listen(NULL, argv[1], &addrlen);
@@ -158,8 +157,8 @@
     return 0;
   }
 
-  /* ka: keep alive*/
-  int
+/* ka: keep alive*/
+int
   tcpsrv_preka(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[], void (*child_task)(int))
   {
     int             listenfd, i;
@@ -204,9 +203,9 @@
     return 0;
   }
 
-  #define PROXY_BS 8192
+#define PROXY_BS 8192
 
-  static int
+static int
   streamer(int from, int to)
   {
     char buf[PROXY_BS];
@@ -238,14 +237,14 @@
     return 0;
   }
 
-  int tcpsrv_proxy(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[]){
+int tcpsrv_proxy(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[]){
     /* Connection params */
     int             in_listenfd, in_connfd;
     int             out_connfd;
-    int             i;
+    //int             i;
     struct sockaddr	*cliaddr;
     socklen_t       clilen, addrlen;
-    pid_t           pid;
+    //pid_t           pid;
 
     /* Internal variables */
 
@@ -287,7 +286,7 @@
   }
 
 
-  int
+int
   tcpsrv_mixed(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[], void (*child_task)(int))
   {
     int                listenfd, connfd, i;
@@ -381,14 +380,14 @@
     return 0;
   }
 
-  int
+int
   tcpsrv_select(int argc, char *argv[], int sigc, void (*sigv[])(int), int intv[], void (*server_task)(int))
   {
     int			i, maxi, maxfd, listenfd, connfd, sockfd;
     int			nready, client[FD_SETSIZE];
-    ssize_t		n;
+    //ssize_t		n;
     fd_set		rset, allset;
-    char			buf[MAXLINE];
+    //char			buf[MAXLINE];
     socklen_t		clilen;
     struct sockaddr_in	cliaddr, servaddr;
 
@@ -461,4 +460,3 @@
       }
     }
   }
-  
