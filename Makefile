@@ -4,24 +4,19 @@ CFLAGS=-Wall -g
 .PHONY: cscope doxygen # http://stackoverflow.com/questions/3931741/why-does-make-think-the-target-is-up-to-date
 
 compile: copylunp
-	$(CC) $(CFLAGS) -o test/socket_client test/client/client-empty.c test/*.c -I client -lpthread -lm
-	#$(CC) $(CFLAGS) -o test/socket_server test/server/server-empty.c test/*.c -I server -lpthread -lm
-	#./test/socket_client
-	#./test/socket_server
-
-clientserver: copylunp
-	$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -I client -lpthread -lm
-	$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -I server -lpthread -lm
-	#./test/socket_client
-	#./test/socket_server
-
+	$(CC) $(CFLAGS) -o /tmp/lunp-compilation test/client/client-empty.c test/*.c -I client -lpthread -lm
+	rm -f /tmp/lunp-compilation
+	
 client: copylunp
 	$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -I client -lpthread -lm
-	#./test/socket_client
+	./test/socket_client $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
 	
 server: copylunp
 	$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -I server -lpthread -lm
-	#./test/socket_server
+	./test/socket_server $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
+	
+%:      # thanks to chakrit
+	@:    # thanks to William Pursell
 	
 copylunp: clean
 	cp src/*.c test
@@ -29,8 +24,6 @@ copylunp: clean
 	cp -n src/common.h test/common.h
 
 clean:
-	rm -f test/socket_client
-	rm -f test/socket_server
 	rm -f test/*.c
 	find test/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec rm \{} \;
 

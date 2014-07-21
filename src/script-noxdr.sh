@@ -4,26 +4,10 @@
 zipDir="../" # exam_2014-07-21/DP_July14_Test/
 typesDir="../tools/" # exam_2014-07-21/DP_July14_Test/tools/
 
-if [ ! -f $typesDir"types.h" ] ; then
-  rpcgen -h $typesDir"types.x" -o $typesDir"types.h"
-fi
-    
-if [ ! -f $typesDir"types.c" ] ; then
-  rpcgen -c $typesDir"types.x" -o $typesDir"types.c"
-fi
-
 case $1 in
 
   "compile") # http://stackoverflow.com/a/1024532
-  
-    if [ ! -f "types.h" ] ; then
-      cp $typesDir"types.h" "types.h"
-    fi
-	
-    if [ ! -f "types.c" ] ; then
-      cp $typesDir"types.c" "types.c"
-    fi
-      
+    
     if gcc -Wall -o socket_client client/*.c *.c -I client -lpthread -lm ; then
       if gcc -Wall -o socket_server server/*.c *.c -I server -lpthread -lm ; then
 	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
@@ -34,14 +18,6 @@ case $1 in
 
     
   "compile1") # http://stackoverflow.com/a/1024532
-  
-    if [ ! -f "types.h" ] ; then
-      cp $typesDir"types.h" "types.h"
-    fi
-	
-    if [ ! -f "types.c" ] ; then
-      cp $typesDir"types.c" "types.c"
-    fi
     
     if gcc -Wall -o socket_client1 client1/*.c *.c -I client1 -lpthread -lm ; then
       if gcc -Wall -o socket_server1 server1/*.c *.c -I server1 -lpthread -lm ; then
@@ -53,14 +29,6 @@ case $1 in
 
     
   "compile2") # http://stackoverflow.com/a/1024532
-  
-    if [ ! -f "types.h" ] ; then
-      cp $typesDir"types.h" "types.h"
-    fi
-	
-    if [ ! -f "types.c" ] ; then
-      cp $typesDir"types.c" "types.c"
-    fi
     
     if gcc -Wall -o socket_client client/*.c *.c -I client -lpthread -lm ; then
       if gcc -Wall -o socket_server server/*.c *.c -I server -lpthread -lm ; then
@@ -72,14 +40,6 @@ case $1 in
    
    
   "test")
-    
-    if [ -f "types.h" ] ; then
-      rm "types.h"
-    fi
-    
-    if [ -f "types.c" ] ; then
-      rm "types.c"
-    fi
       
     if [ -f $zipDir"socket.zip" ] ; then
       rm $zipDir"socket.zip"
@@ -92,14 +52,6 @@ case $1 in
    
    
   "test12")
-    
-    if [ -f "types.h" ] ; then
-      rm "types.h"
-    fi
-    
-    if [ -f "types.c" ] ; then
-      rm "types.c"
-    fi
       
     if [ -f $zipDir"socket.zip" ] ; then
       rm $zipDir"socket.zip"
