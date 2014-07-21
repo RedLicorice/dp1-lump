@@ -1,15 +1,13 @@
-/*
- * argv[1] = porta
- */
-
 #include "../lunp.h"
+
+#define SERVER_PORT_ARG argv[1]
 
 void childTask(SOCKET sockfd);
 
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
   
-  sockfd = myTcpServerStartup(argv[1]);
+  sockfd = myTcpServerStartup(SERVER_PORT_ARG);
   
   myTcpServerSimple(sockfd, &childTask);
   

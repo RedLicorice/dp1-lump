@@ -1,13 +1,11 @@
-/*
- * argv[1] = indirizzo del server
- * argv[2] = porta del server
- */
-
 #include "../lunp.h"
+
+#define SERVER_ADDRESS_ARG argv[1] // server address
+#define SERVER_PORT_ARG argv[2] // server port
 
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
-  sockfd = myTcpClientStartup(argv[1], argv[2]);
+  sockfd = myTcpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG);
   myClose(sockfd);
   return 0;
 }

@@ -2,30 +2,38 @@ CC=gcc
 CFLAGS=-Wall -g
 
 .PHONY: cscope doxygen # http://stackoverflow.com/questions/3931741/why-does-make-think-the-target-is-up-to-date
-
+	
 compile: copylunp
-	$(CC) $(CFLAGS) -o /tmp/lunp-compilation test/client/client-empty.c test/*.c -I client -lpthread -lm
-	rm -f /tmp/lunp-compilation
+	@echo "*******************Compiling client-empty...*******************"
+	@$(CC) $(CFLAGS) -o /tmp/lunp-compilation test/client/client-empty.c test/*.c -I client -lpthread -lm
+	@rm -f /tmp/lunp-compilation
 	
 client: copylunp
-	$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -I client -lpthread -lm
-	./test/socket_client $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
+	@echo "*******************Compiling client...*******************"
+	@$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -I client -lpthread -lm
+	
+	@echo "\n\n*******************Launching client...*******************"
+	@./test/socket_client $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
 	
 server: copylunp
-	$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -I server -lpthread -lm
-	./test/socket_server $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
+	@echo "*******************Compiling server...*******************"
+	@$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -I server -lpthread -lm
+	
+	@echo "\n\n*******************Launching server...*******************"
+	@./test/socket_server $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
 	
 %:      # thanks to chakrit
 	@:    # thanks to William Pursell
 	
 copylunp: clean
-	cp src/*.c test
-	find src/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec cp \{} test/ \;
-	cp -n src/common.h test/common.h
+	@cp src/*.c test
+	@find src/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec cp \{} test/ \;
+	@cp -n src/common.h test/common.h
 
 clean:
-	rm -f test/*.c
-	find test/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec rm \{} \;
+	@clear
+	@rm -f test/*.c
+	@find test/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec rm \{} \;
 
 doxygen:
 	doxygen Doxyfile

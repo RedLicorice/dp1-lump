@@ -1,9 +1,7 @@
-/*
- * argv[1] = indirizzo del server
- * argv[2] = porta del server
- */
-
 #include "../lunp.h"
+
+#define SERVER_ADDRESS_ARG argv[1] // server address
+#define SERVER_PORT_ARG argv[2] // server port
 
 #define BUFFER_SIZE 14
 #define NUMBER_SIZE 6
@@ -14,15 +12,15 @@ int main(int argc, char *argv[]) {
   char bufferOut[MAXLINE], bufferIn[BUFFER_SIZE];
   char num2string[NUMBER_SIZE];
   
-  sockfd = myTcpClientStartup(argv[1], argv[2]);
+  sockfd = myTcpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG);
   
-  printf("Digitare il primo numero: ");
+  printf("Please type the first number: ");
   scanf("%d", &num1);
   snprintf(bufferIn, NUMBER_SIZE, "%d", num1);
   
   strcat(bufferIn, " ");
   
-  printf("Digitare il secondo numero: ");
+  printf("Please type the second number: ");
   scanf("%d", &num2);
   snprintf(num2string, NUMBER_SIZE, "%d", num2);
   strcat(bufferIn, num2string);
@@ -33,7 +31,7 @@ int main(int argc, char *argv[]) {
   
   myTcpReadLine(sockfd, bufferOut, MAXLINE, NULL);
   
-  printf("Il server ha risposto: %s", bufferOut);
+  printf("The server replied: %s", bufferOut);
   
   myClose(sockfd);
   return 0;

@@ -1,9 +1,13 @@
 #!/bin/bash
 
-# root = exam_2014-07-21/DP_July14_Test/socket/
-zipDir="../" # exam_2014-07-21/DP_July14_Test/
-typesDir="../tools/" # exam_2014-07-21/DP_July14_Test/tools/
+# root = exam_dp_monthyyyy/source/
+zipDir="../" # exam_dp_monthyyyy/
+typesDir="../tools/" # exam_dp_monthyyyy/tools/
 
+clear
+
+
+echo -e "\n*******************Generating rcpgen files...*******************"
 if [ ! -f $typesDir"types.h" ] ; then
   rpcgen -h $typesDir"types.x" -o $typesDir"types.h"
 fi
@@ -11,6 +15,7 @@ fi
 if [ ! -f $typesDir"types.c" ] ; then
   rpcgen -c $typesDir"types.x" -o $typesDir"types.c"
 fi
+
 
 case $1 in
 
@@ -24,8 +29,11 @@ case $1 in
       cp $typesDir"types.c" "types.c"
     fi
       
+    echo -e "\n*******************Compiling client...*******************"
     if gcc -Wall -o socket_client client/*.c *.c -I client -lpthread -lm ; then
+      echo -e "\n*******************Compiling server...*******************"
       if gcc -Wall -o socket_server server/*.c *.c -I server -lpthread -lm ; then
+	echo -e "\n*******************Launching server...*******************"
 	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
 	./socket_server "$@"
       fi
@@ -43,8 +51,11 @@ case $1 in
       cp $typesDir"types.c" "types.c"
     fi
     
+    echo -e "\n*******************Compiling client1...*******************"
     if gcc -Wall -o socket_client1 client1/*.c *.c -I client1 -lpthread -lm ; then
+      echo -e "\n*******************Compiling server1...*******************"
       if gcc -Wall -o socket_server1 server1/*.c *.c -I server1 -lpthread -lm ; then
+	echo -e "\n*******************Launching server1...*******************"
 	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
 	./socket_server1 "$@"
       fi
@@ -62,8 +73,11 @@ case $1 in
       cp $typesDir"types.c" "types.c"
     fi
     
+    echo -e "\n*******************Compiling client2...*******************"
     if gcc -Wall -o socket_client client/*.c *.c -I client -lpthread -lm ; then
+      echo -e "\n*******************Compiling server2...*******************"
       if gcc -Wall -o socket_server server/*.c *.c -I server -lpthread -lm ; then
+	echo -e "\n*******************Launching server2...*******************"
 	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
 	./socket_server "$@"
       fi
@@ -81,12 +95,14 @@ case $1 in
       rm "types.c"
     fi
       
+    echo -e "\n*******************Zipping...*******************"
     if [ -f $zipDir"socket.zip" ] ; then
       rm $zipDir"socket.zip"
     fi
     zip $zipDir"socket.zip" client/*.c client/*.h server/*.c server/*.h *.c *.h
     
     cd $zipDir
+    echo -e "\n*******************Launching tests...*******************"
     bash "./test.sh"
     ;;
    
@@ -101,13 +117,21 @@ case $1 in
       rm "types.c"
     fi
       
+    echo -e "\n*******************Zipping...*******************"
     if [ -f $zipDir"socket.zip" ] ; then
       rm $zipDir"socket.zip"
     fi
     zip $zipDir"socket.zip" client1/*.c client1/*.h server1/*.c server1/*.h client2/*.c client2/*.h server2/*.c server2/*.h *.c *.h
     
     cd $zipDir
+    echo -e "\n*******************Launching tests12...*******************"
     bash "./test.sh"
     ;;
+    
+    
+  *)
+  
+    echo $"Invalid command"
+    exit 1
     
 esac
