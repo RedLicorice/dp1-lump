@@ -12,31 +12,6 @@
  */
 SOCKET myTcpClientStartup(const char *serverAddress, const char *serverPort);
 
-/** @brief Crea un socket TCP associato alla porta specificata.
- * @param serverPort La porta del server a cui associare il socket creato.
- * @return Restituisce il file descriptor del socket TCP creato.
- */
-SOCKET myTcpServerStartup(const char *serverPort);
-
-/** @brief La funzione che viene chiamata dalla funzione @c myTcpServerSimple ogni volta che un client si connette al server.
- * @param sockfd Il file descriptor del socket a cui il client da servire è conesso.
- */
-typedef void (*myTcpServerChildTask)(SOCKET sockfd);
-
-/** @brief Implementa un server TCP che serve un client per volta.
- * @param sockfd Il file descriptor del socket a cui i client si connettono.
- * @param childTask La funzione da chiamare ogni volta che un client si connette al socket @p sockfd.
- * @warning Questa funzione non ritorna mai.
- */
-void myTcpServerSimple(SOCKET sockfd, myTcpServerChildTask childTask);
-
-/** @brief Accetta una connessione sul socket TCP specificato.
- * @param sockfd Il file descriptor del socket TCP su cui accettare la connessione.
- * @retval clientStruct La struttura contenente le informazioni sul client.
- * @return Restituisce il file descriptor del socket TCP accettato.
- */
-SOCKET myTcpServerAccept(SOCKET sockfd, struct sockaddr_in *clientStruct);
-
 /** @brief Riceve fino a @p byteCount byte di dati.
  * @param sockfd Il file descriptor del socket da cui leggere i dati.
  * @retval buffer Il buffer in cui scrivere i dati ricevuti (dimensione @p byteCount). Se è uguale a NULL, il buffer viene allocato dinamicamente.

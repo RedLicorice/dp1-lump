@@ -7,56 +7,6 @@ SOCKET myTcpClientStartup(const char *serverAddress, const char *serverPort) {
   return Tcp_connect(serverAddress, serverPort); // tcp_connect.c
 }
 
-SOCKET myTcpServerStartup(const char *serverPort) {
-  SOCKET sockfd;
-  struct sockaddr_in saddr;
-  
-  sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if (sockfd == -1)
-    mySystemError("socket", "myTcpServerStartup");
-  
-  //saddr.sin_len = sizeof(struct sockaddr_in);
-  saddr.sin_family = AF_INET; // IPv4
-  saddr.sin_port = htons(atoi(serverPort));
-  saddr.sin_addr.s_addr = INADDR_ANY;
-  
-  if (bind(sockfd, (struct sockaddr*)&saddr, sizeof(struct sockaddr_in)) == -1)
-    mySystemError("bind", "myTcpServerStartup");
-  
-  if (listen(sockfd, 2) == -1)
-    mySystemError("listen", "myTcpServerStartup");
-  
-  return sockfd;
-}
-
-void myTcpServerSimple(SOCKET sockfd, myTcpServerChildTask childTask) {
-  SOCKET sockfd_copy;
-  struct sockaddr_in clientAddr;
-  
-  while (1) {
-    
-    printf("\n");
-    myWarning("Server on listening...", "myTcpServerSimple");
-    
-    sockfd_copy = myTcpServerAccept(sockfd, &clientAddr);
-    if (sockfd_copy == -1)
-      mySystemError("accept", "myTcpServerOCPC");
-    
-    childTask(sockfd_copy);
-    
-    myClose(sockfd_copy);
-    
-  }
-}
-
-SOCKET myTcpServerAccept(SOCKET sockfd, struct sockaddr_in *clientStruct) {
-  socklen_t addrlen;
-  
-  addrlen = sizeof(struct sockaddr_in);
-  
-  return Accept(sockfd, (struct sockaddr*)clientStruct, &addrlen);
-}
-
 bool myTcpReadBytes(SOCKET sockfd, void *buffer, int byteCount, int *readByteCount) {
   ssize_t readByteCountTmp;
   

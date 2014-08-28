@@ -6,6 +6,6 @@
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
   sockfd = myTcpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG);
-  myClose(sockfd);
+  Close(sockfd);
   return 0;
 }

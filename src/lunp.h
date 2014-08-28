@@ -558,6 +558,7 @@ typedef enum bool_t bool;
 
 #include "lunp_lg-other.h"
 #include "lunp_lg-tcp.h"
+#include "lunp_lg-tcpserver.h"
 #include "lunp_lg-udp.h"
 #include "lunp_lg-error.h"
 

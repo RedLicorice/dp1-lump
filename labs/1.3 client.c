@@ -33,6 +33,6 @@ int main(int argc, char *argv[]) {
   
   printf("The server replied: %s", bufferOut);
   
-  myClose(sockfd);
+  Close(sockfd);
   return 0;
 }

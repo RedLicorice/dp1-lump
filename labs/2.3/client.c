@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   while (strcmp(fileName, "") != 0) {
     
     if (clientTask(sockfd, fileName) == false) {
-      myClose(sockfd);
+      Close(sockfd);
       return 1;
     }
     
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
   
   myTcpWriteString(sockfd, QUIT);
   
-  myClose(sockfd);
+  Close(sockfd);
   return 0;
 }
 
