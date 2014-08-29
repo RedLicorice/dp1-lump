@@ -1,17 +1,24 @@
 #include "../lunp.h"
 
 #define SERVER_PORT_ARG argv[1] // server port
+#define CHILD_COUNT_ARG argv[2] // number of children
 
-#define MAX_CHILD_COUNT 3
+#define MAX_CHILD_COUNT 10
+#define MAX_SECOND_COUNT 10
 
 void childTask(SOCKET sockfd);
 
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
+  int childCount;
+  
+  childCount = atoi(CHILD_COUNT_ARG);
+  if (childCount > MAX_CHILD_COUNT)
+    myError("This server supports a maximum number of children equal to %d", NULL, MAX_CHILD_COUNT);
   
   sockfd = myTcpServerStartup(SERVER_PORT_ARG);
   
-  myTcpServerOCPCMax(sockfd, MAX_CHILD_COUNT, &childTask);
+  myTcpServerPreforked(sockfd, childCount, &childTask);
   
   return 0;
 }
@@ -21,6 +28,11 @@ void childTask(SOCKET sockfd) {
   char clientReq[clientReqLen];
   uint32_t fileSize;
   char nomeFile[MAXFILENAMELENGTH];
+  
+  struct timespec begin, end;
+  int numberOfElapsedSeconds;
+  
+  clock_gettime(CLOCK_REALTIME, &begin);
   
   printf("\n");
   myWarning("Connection accepted", "childTask");
@@ -53,6 +65,13 @@ void childTask(SOCKET sockfd) {
       
       myTcpReadFromFileAndWriteChunks(sockfd, nomeFile);
       myWarning("File sent successfully to the client...", "childTask");
+    }
+	  
+    clock_gettime(CLOCK_REALTIME, &end);
+    numberOfElapsedSeconds = (int)(end.tv_sec - begin.tv_sec);
+    if (numberOfElapsedSeconds > MAX_SECOND_COUNT) {
+      myWarning("Expired time", "childTask");
+      return;
     }
     
   }

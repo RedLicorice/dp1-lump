@@ -1,5 +1,4 @@
 #include "lunp.h"
-#include "ldf-srv.h"
 
 int
 udpsrv_simple(int argc, char **argv, int sigc, void (*sigv[])(int), int intv[], void(*dg_cli)(FILE *ifp, int sockfd, SA *cliaddr, socklen_t clilen))

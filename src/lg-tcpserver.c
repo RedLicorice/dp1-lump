@@ -1,10 +1,13 @@
 #include "lunp.h"
 
+int numChildren = 0;
+
+pid_t *childpids;
+
 static void waitForZombieChildren();
 
 static void sigusr1Handler(int s);
-
-int numChildren = 0;
+static void sigintHandler(int s);
 
 SOCKET myTcpServerAccept(SOCKET sockfd, struct sockaddr_in *clientStruct) {
   socklen_t addrlen;
@@ -132,6 +135,37 @@ void myTcpServerOCPCMax(SOCKET sockfd, int maxChildCount, myTcpServerChildTask c
   }
 }
 
+void myTcpServerPreforked(SOCKET sockfd, int childCount, myTcpServerChildTask childTask) {
+  int i;
+  pid_t childpid;
+  
+  numChildren = childCount - 1;
+  childpids = (pid_t*)malloc(sizeof(pid_t) * numChildren);
+  
+  for (i = 0; i < numChildren; ++i) {
+    
+    childpid = fork();
+    if (childpid == -1)
+      mySystemError("fork", "myTcpServerPreforked");
+    
+    if (childpid == 0) {
+      // child
+      myTcpServerSimple(sockfd, childTask);
+      return;
+    }
+    
+    // father
+    childpids[i] = childpid;
+    
+  }
+  
+  if (signal(SIGINT, sigintHandler) == SIG_ERR)
+    mySystemError("signal", "myTcpServerPreforked");
+  
+  // The father becomes the last child
+  myTcpServerSimple(sockfd, childTask);
+}
+
 static void waitForZombieChildren() {
   pid_t childpid;
   
@@ -155,5 +189,20 @@ static void sigusr1Handler(int s) {
       return;
     
     waitForZombieChildren();
+  }
+}
+
+static void sigintHandler(int s) {
+  int i;
+  if (s == SIGINT) {
+    myWarning("Received SIGINT signal", "sigintHandler");
+    
+    for (i = 0; i < numChildren; ++i)
+      kill(childpids[i], SIGINT);
+    
+    for (i = 0; i < numChildren; ++i)
+      waitpid(childpids[i], NULL, 0);
+    
+    exit(0);
   }
 }

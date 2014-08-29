@@ -1,6 +1,6 @@
 #include "../lunp.h"
 
-#define SERVER_PORT_ARG argv[1]
+#define SERVER_PORT_ARG argv[1] // server port
 
 void childTask(SOCKET sockfd);
 

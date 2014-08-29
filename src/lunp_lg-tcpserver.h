@@ -45,4 +45,12 @@ void myTcpServerOCPC(SOCKET sockfd, myTcpServerChildTask childTask);
  */
 void myTcpServerOCPCMax(SOCKET sockfd, int maxChildCount, myTcpServerChildTask childTask);
 
+/** @brief Implementa un server TCP che serve fino a @p childCount client tramite il pre-fork di @p childCount processi figlio.
+ * @param sockfd Il file descriptor del socket a cui i client si connettono.
+ * @param childCount Il numero massimo di client da servire allo stesso tempo.
+ * @param childTask La funzione da chiamare ogni volta che un client si connette al socket @p sockfd.
+ * @warning Questa funzione non ritorna mai.
+ */
+void myTcpServerPreforked(SOCKET sockfd, int childCount, myTcpServerChildTask childTask);
+
 #endif

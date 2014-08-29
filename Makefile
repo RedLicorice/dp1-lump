@@ -5,8 +5,10 @@ CFLAGS=-Wall -g
 	
 compile: copylunp
 	@echo "*******************Compiling client-empty...*******************"
-	@$(CC) $(CFLAGS) -o /tmp/lunp-compilation test/client/client-empty.c test/*.c -I client -lpthread -lm
-	@rm -f /tmp/lunp-compilation
+	@rm -rf /tmp/lunp
+	@mkdir -p /tmp/lunp
+	@$(CC) $(CFLAGS) -o /tmp/lunp/compilation test/client/client-empty.c test/*.c -I client -lpthread -lm
+	@rm -rf /tmp/lunp
 	
 client: copylunp
 	@echo "*******************Compiling client...*******************"
