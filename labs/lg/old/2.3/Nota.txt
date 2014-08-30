@@ -1,0 +1,1 @@
+È necessario spostare gli eseguibili del client e del server in due cartelle diverse, onde evitare che il client tenti di scrivere su un file che è in lettura dal server.

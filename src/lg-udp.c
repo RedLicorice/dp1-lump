@@ -30,3 +30,52 @@ SOCKET myUdpServerStartup(const char *serverPort) {
   
   return sockfd;
 }
+
+bool myUdpReadBytes(SOCKET sockfd, void *buffer, int byteCount, struct sockaddr_in *sourceStruct, int *readByteCount) {
+  ssize_t readByteCountTmp;
+  socklen_t addrlen;
+  
+  if (buffer == NULL)
+    buffer = (void*)malloc(sizeof(void) * byteCount);
+  
+  if (sourceStruct == NULL)
+    readByteCountTmp = recvfrom(sockfd, buffer, byteCount, 0, NULL, NULL);
+  else { // sourceStruct != NULL
+    addrlen = sizeof(struct sockaddr_in);
+    readByteCountTmp = recvfrom(sockfd, buffer, byteCount, 0, (struct sockaddr*)sourceStruct, &addrlen);
+  }
+  
+  if (readByteCount != NULL)
+    *readByteCount = (int)readByteCountTmp;
+  
+  if (readByteCountTmp < byteCount)
+    return false;
+  else
+    return true;
+}
+
+void myUdpWriteBytes(SOCKET sockfd, void *data, int byteCount, struct sockaddr_in destStruct) {
+  Sendto(sockfd, data, (size_t)byteCount, MSG_NOSIGNAL, (struct sockaddr*)&destStruct, sizeof(struct sockaddr_in));
+}
+
+bool myUdpReadBytesTimeout(SOCKET sockfd, void *buffer, int byteCount, int maxSeconds, struct sockaddr_in *sourceStruct, int *readByteCount) {
+  fd_set cset;
+  struct timeval timeout;
+  int numberOfSockets;
+  
+  FD_ZERO(&cset);
+  FD_SET(sockfd, &cset);
+  timeout.tv_sec = maxSeconds;
+  timeout.tv_usec = 0;
+
+  numberOfSockets = select(FD_SETSIZE, &cset, NULL, NULL, &timeout);
+  
+  if (numberOfSockets == 0)
+    return false; // expired timeout
+    
+  if (numberOfSockets == -1)
+    mySystemError("select", "myUdpReadBytesTimeout");
+  
+  myUdpReadBytes(sockfd, buffer, byteCount, sourceStruct, readByteCount);
+  return true;
+}
