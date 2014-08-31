@@ -9,7 +9,7 @@
 #define MAX_SECONDS 3
 
 int main(int argc, char *argv[]) {
-  int sockfd;
+  SOCKET sockfd;
   char bufferReply[N];
   struct sockaddr_in daddr;
 
@@ -17,8 +17,10 @@ int main(int argc, char *argv[]) {
   
   myUdpWriteBytes(sockfd, (void*)NAME_ARG, sizeof(NAME_ARG), daddr);
 
-  if (myUdpReadBytesTimeout(sockfd, (void*)bufferReply, N, MAX_SECONDS, NULL, NULL) == false)
+  if (myWaitForSingleObject(MAX_SECONDS, sockfd) == false)
     myError("Expired timeout", "main");
+  
+  myUdpReadBytes(sockfd, (void*)bufferReply, N, NULL, NULL);
   
   printf("Reply from server: %s\n", bufferReply);
 

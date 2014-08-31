@@ -5,7 +5,8 @@
 #define N 32
 
 int main(int argc, char *argv[]) {
-  int sockfd, numberOfReadBytes;
+  SOCKET sockfd;
+  int numberOfReadBytes;
   char bufferReply[N];
   struct sockaddr_in daddr;
   

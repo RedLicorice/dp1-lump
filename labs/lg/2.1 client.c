@@ -37,8 +37,10 @@ bool clientTask(SOCKET sockfd, char *name, struct sockaddr_in daddr, char *buffe
     
     myUdpWriteBytes(sockfd, (void*)name, sizeof(name), daddr);
 
-    if (myUdpReadBytesTimeout(sockfd, (void*)bufferReply, N, MAX_SECONDS, NULL, NULL) == true)
+    if (myWaitForSingleObject(MAX_SECONDS, sockfd) == true) {
+      myUdpReadBytes(sockfd, (void*)bufferReply, N, NULL, NULL);
       return true;
+    }
     
   }
   
