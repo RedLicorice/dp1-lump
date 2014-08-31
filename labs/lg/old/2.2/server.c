@@ -80,16 +80,15 @@ int main(int argc, char *argv[]) {
     
     if (found == 0) {
       printf("Questo client è nuovo.\n");
-      if (clientsLastIndex == 9) {
+      if (clientsLastIndex == 9)
 	for (i = 0; i < 9; ++i)
-	  clients[i + 1] = clients[i];
-	i = 0;
-      } else {
+	  clients[i] = clients[i + 1];
+	
+      else
 	clientsLastIndex++;
-	i = clientsLastIndex;
-      }
-      clients[i].address = daddr;
-      clients[i].numberOfPackets = 1;
+      
+      clients[clientsLastIndex].address = daddr;
+      clients[clientsLastIndex].numberOfPackets = 1;
       valid = 1;
     }
       
