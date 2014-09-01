@@ -5,8 +5,8 @@ typedef struct client_s {
   int numberOfDatagrams;
 } client_t;
 
-static int searchForClient(struct sockaddr_in clientStruct, client_t *clientList, int clientListIndex);
-static bool areSockaddrinEqual(struct sockaddr_in address1, struct sockaddr_in address2);
+int searchForClient(struct sockaddr_in clientStruct, client_t *clientList, int clientListIndex);
+bool areSockaddrinEqual(struct sockaddr_in address1, struct sockaddr_in address2);
 
 SOCKET myUdpClientStartup(const char *serverAddress, const char *serverPort, struct sockaddr_in *serverStruct) {
   SOCKET sockfd;
@@ -101,7 +101,7 @@ bool myUdpLimitClients(struct sockaddr_in clientStruct, int maxDatagrams, int ma
   return true;
 }
 
-static int searchForClient(struct sockaddr_in clientStruct, client_t *clientList, int clientListIndex) {
+int searchForClient(struct sockaddr_in clientStruct, client_t *clientList, int clientListIndex) {
   int i;
   for (i = 0; i <= clientListIndex; ++i)
     if (areSockaddrinEqual(clientStruct, clientList[i].clientStruct) == true)
@@ -109,7 +109,7 @@ static int searchForClient(struct sockaddr_in clientStruct, client_t *clientList
   return -1;
 }
 
-static bool areSockaddrinEqual(struct sockaddr_in struct1, struct sockaddr_in struct2) {
+bool areSockaddrinEqual(struct sockaddr_in struct1, struct sockaddr_in struct2) {
   if (struct1.sin_family != struct2.sin_family)
     return false;
   if (struct1.sin_port != struct2.sin_port)

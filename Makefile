@@ -10,22 +10,24 @@ compile: copylunp
 	@$(CC) $(CFLAGS) -o /tmp/lunp/compilation test/client/client-empty.c test/*.c -I client -lpthread -lm
 	@rm -rf /tmp/lunp
 	
-client: copylunp
-	@echo "*******************Compiling client...*******************"
-	@$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -I client -lpthread -lm
-	
+client: compile-client
 	@echo "\n\n*******************Launching client...*******************"
 	@./test/socket_client $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
 	
-server: copylunp
-	@echo "*******************Compiling server...*******************"
-	@$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -I server -lpthread -lm
-	
+server: compile-server
 	@echo "\n\n*******************Launching server...*******************"
 	@./test/socket_server $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
 	
 %:      # thanks to chakrit
 	@:    # thanks to William Pursell
+	
+compile-client: copylunp
+	@echo "*******************Compiling client...*******************"
+	@$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -I client -lpthread -lm
+	
+compile-server: copylunp
+	@echo "*******************Compiling server...*******************"
+	@$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -I server -lpthread -lm
 	
 copylunp: clean
 	@cp src/*.c test

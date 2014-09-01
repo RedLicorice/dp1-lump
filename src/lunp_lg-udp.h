@@ -25,7 +25,7 @@ SOCKET myUdpServerStartup(const char *serverPort);
  * @param maxByteCount Il numero massimo di byte di dati da ricevere.
  * @retval sourceStruct La struttura contenente le informazioni sulla sorgente da cui i dati sono ricevuti. Se viene passato NULL, questo parametro viene ignorato.
  * @retval readByteCount Il numero di byte letti. Se viene passato NULL, questo parametro viene ignorato.
- * @return Restituisce true se tutti i dati sono stati letti, false se è stato raggiunto l'end-of-file (numero di byte letti minore di @p byteCount).
+ * @return Restituisce true se tutti i dati sono stati letti. Restituisce false se è stato raggiunto l'end-of-file (numero di byte letti minore di @p byteCount).
  */
 bool myUdpReadBytes(SOCKET sockfd, void *buffer, int maxByteCount, struct sockaddr_in *sourceStruct, int *readByteCount);
 

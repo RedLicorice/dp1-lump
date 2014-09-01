@@ -160,7 +160,7 @@ int socketLibero(int sockfd, char *comando, int *stato, int flagQuit) {
       
       
     case 2: // sto leggendo il numero di byte del file
-      numberOfReadBytes = readnUnaVolta(sockfd, ptr, 4, &leftBytes);
+      numberOfReadBytes = readnUnaVolta(sockfd, ptr, leftBytes, &leftBytes);
       if (numberOfReadBytes <= 0) {
 	if (close(sockfd) == -1)
 	  printf("Errore nella close(): %s\n", strerror(errno));

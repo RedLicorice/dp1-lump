@@ -27,7 +27,7 @@ void childTask(SOCKET sockfd) {
   
   while (1) {
     
-    if (myTcpReadLine(sockfd, clientReq, clientReqLen, NULL) == false)
+    if (myTcpReadLine(sockfd, clientReq, clientReqLen - 1, NULL) == false)
       return;
     
     if (strcmp(clientReq, QUIT) == 0) {

@@ -4,7 +4,7 @@ int numChildren = 0;
 
 pid_t *childpids;
 
-static void waitForZombieChildren();
+void waitForZombieChildren();
 
 static void sigusr1Handler(int s);
 static void sigintHandler(int s);
@@ -166,7 +166,7 @@ void myTcpServerPreforked(SOCKET sockfd, int childCount, myTcpServerChildTask ch
   myTcpServerSimple(sockfd, childTask);
 }
 
-static void waitForZombieChildren() {
+void waitForZombieChildren() {
   pid_t childpid;
   
     childpid = waitpid(-1, NULL, WNOHANG);
