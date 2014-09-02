@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 }
 
 void childTask(SOCKET sockfd) {
-  char clientReq[MAXLINE + 1], serverRes[MAXLINE + 1];
+  char clientReq[BUFFSIZE], serverRes[BUFFSIZE];
   uint16_t op1, op2;
   uint32_t result;
   
@@ -24,7 +24,7 @@ void childTask(SOCKET sockfd) {
   
   while (1) {
     
-    if (myTcpReadLine(sockfd, clientReq, MAXLINE, NULL) == false)
+    if (myTcpReadLine(sockfd, clientReq, BUFFSIZE, NULL) == false)
       return;
     
     if (sscanf(clientReq, "%hu %hu", &op1, &op2) != 2) // h = unsigned int -> uint16_t (https://en.wikipedia.org/wiki/Printf_format_string#Format_placeholders)

@@ -33,17 +33,14 @@ int main(int argc, char *argv[]) {
 }
 
 bool clientTask(SOCKET sockfd, char *fileName) {
-  char clientReq[strlen(GET) + MAXFILENAMELENGTH + strlen("\r\n")];
-  char serverRes[7]; // 7 = max(strlen(OK), strlen(ERR)) + 1
-  int byteCount;
+  char serverRes[BUFFSIZE];
+  uint32_t fileSize;
   
-  strcpy(clientReq, GET);
-  strcat(clientReq, fileName);
-  strcat(clientReq, "\r\n");
+  myTcpWriteString(sockfd, GET);
+  myTcpWriteString(sockfd, fileName);
+  myTcpWriteString(sockfd, "\r\n");
   
-  myTcpWriteString(sockfd, clientReq);
-  
-  myTcpReadLine(sockfd, serverRes, 6, NULL);
+  myTcpReadLine(sockfd, serverRes, BUFFSIZE, NULL);
   
   if (strcmp(serverRes, ERR) == 0) {
     myWarning("Illegal command or non-existing file", "clientTask");
@@ -51,10 +48,10 @@ bool clientTask(SOCKET sockfd, char *fileName) {
   }
     
   // else: serverRes = OK
-  myTcpReadBytes(sockfd, (void*)(&byteCount), 4, NULL);
-  byteCount = ntohl(byteCount);
+  myTcpReadBytes(sockfd, (void*)(&fileSize), sizeof(uint32_t), NULL);
+  fileSize = ntohl(fileSize);
   
-  if (myTcpReadChunksAndWriteToFile(sockfd, fileName, byteCount, NULL) == false) {
+  if (myTcpReadChunksAndWriteToFile(sockfd, fileName, fileSize, NULL) == false) {
     myWarning("Cannot write the file", "clientTask");
     return true; // prossimo file
   }

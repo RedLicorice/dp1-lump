@@ -32,63 +32,57 @@ void myTcpWriteBytes(SOCKET sockfd, void *data, int byteCount) {
 }
 
 bool myTcpReadString(SOCKET sockfd, char *buffer, int charCount, int *readCharCount) {
+  int readCharCountTmp;
   bool reply;
   
   if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * (charCount + 1));
+    buffer = (char*)malloc(sizeof(char) * charCount);
   
-  reply = myTcpReadBytes(sockfd, (void*)buffer, charCount, readCharCount);
+  reply = myTcpReadBytes(sockfd, (void*)buffer, charCount - 1, &readCharCountTmp);
   
-  /*if (*readCharCount > 0 && buffer[*readCharCount - 1] == '\0') {
-    do {
-      (*readCharCount)--;
-    } while (*readCharCount > 0 && buffer[*readCharCount - 1] == '\0');
-  } else*/
-    buffer[*readCharCount] = '\0';
+  buffer[readCharCountTmp] = '\0';
+  
+  if (readCharCount != NULL)
+    *readCharCount = readCharCountTmp;
   
   return reply;
 }
 
 void myTcpWriteString(SOCKET sockfd, char *string) {
-  Writen(sockfd, (void*)string, strlen(string));
+  myTcpWriteBytes(sockfd, (void*)string, strlen(string));
 }
 
 bool myTcpReadLine(SOCKET sockfd, char *buffer, int maxLength, int *readCharCount) {
   char *ptr;
-  int readCharCount_local;
+  int readCharCountTmp;
   bool found;
   
   if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * (maxLength + 1));
+    buffer = (char*)malloc(sizeof(char) * maxLength);
   
   ptr = buffer;
-  readCharCount_local = 0;
+  readCharCountTmp = 0;
   found = false;
   
-  while ((found == false) && (readCharCount_local < maxLength - 1) && (myTcpReadBytes(sockfd, (void*)ptr, 1, NULL) == true)) {
+  while ((found == false) && (readCharCountTmp < maxLength - 1) && (myTcpReadBytes(sockfd, (void*)ptr, 1, NULL) == true)) {
     if (*ptr == '\n')
       found = true;
     ptr++;
-    readCharCount_local++;
+    readCharCountTmp++;
   }
   
-  /*if (readCharCount_local > 0 && buffer[readCharCount_local - 1] == '\0') {
-    do {
-      readCharCount_local--;
-    } while (readCharCount_local > 0 && buffer[readCharCount_local - 1] == '\0');
-  } else*/
-    buffer[readCharCount_local] = '\0';
+  buffer[readCharCountTmp] = '\0';
     
   if (readCharCount != NULL)
-    *readCharCount = readCharCount_local;
+    *readCharCount = readCharCountTmp;
   
   return found;
 }
 
 int myTcpBufferedReadLine(SOCKET sockfd, char *buffer, int maxLength) {
   if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * (maxLength + 1));
-  return (int)Readline(sockfd, (void*)buffer, (size_t)(maxLength + 1)) - 1; // readline.c
+    buffer = (char*)malloc(sizeof(char) * maxLength);
+  return (int)Readline(sockfd, (void*)buffer, (size_t)maxLength) - 1; // readline.c
 }
 
 bool myTcpReadChunks(SOCKET sockfd, int byteCount, int *readByteCount, myTcpReadChunksCallback callback, void *callbackParam) {
@@ -237,9 +231,9 @@ bool myTcpReadBytesAsync(SOCKET sockfd, void *buffer, int byteCount, int *readBy
 
 bool myTcpReadStringAsync(SOCKET sockfd, char *buffer, int charCount, int *readCharCount) {
   if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * (charCount + 1));
+    buffer = (char*)malloc(sizeof(char) * charCount);
   
-  if (myTcpReadBytesAsync(sockfd, (void*)buffer, charCount, readCharCount) == true) {
+  if (myTcpReadBytesAsync(sockfd, (void*)buffer, charCount - 1, readCharCount) == true) {
     buffer[*readCharCount] = '\0';
     return true;
   }
@@ -255,7 +249,7 @@ bool myTcpReadLineAsync(SOCKET sockfd, char *buffer, int maxLength, int *readCha
     myError("Parameter \"readCharCount\" can not be NULL", "myTcpReadLineAsync");
   
   if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * (maxLength + 1));
+    buffer = (char*)malloc(sizeof(char) * maxLength);
   
   if (myTcpReadBytes(sockfd, buffer + *readCharCount, 1, &readCharCountTmp) == false) {
     completed = true; // end-of-file
@@ -264,7 +258,7 @@ bool myTcpReadLineAsync(SOCKET sockfd, char *buffer, int maxLength, int *readCha
   } else if (buffer[*readCharCount] == '\n')
     completed = true; // reached '\n' character
   
-  else if (*readCharCount == maxLength - 1)
+  else if ((*readCharCount + 1) == (maxLength - 1))
     completed = true; // reached maxLength
   
   else

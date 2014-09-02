@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -Wno-deprecated-declarations
 
 .PHONY: cscope doxygen # http://stackoverflow.com/questions/3931741/why-does-make-think-the-target-is-up-to-date
 	

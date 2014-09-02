@@ -2,12 +2,9 @@
 
 #define SERVER_PORT_ARG argv[1] // server port
 
-#define N 32
-
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
-  int numberOfReadBytes;
-  char bufferReply[N];
+  char clientReq[BUFFSIZE];
   struct sockaddr_in daddr;
   
   sockfd = myUdpServerStartup(SERVER_PORT_ARG);
@@ -16,9 +13,9 @@ int main(int argc, char *argv[]) {
     
     myWarning("\nServer on listening on port %d...", NULL, atoi(SERVER_PORT_ARG));
     
-    myUdpReadBytes(sockfd, (void*)bufferReply, N, &daddr, &numberOfReadBytes);
+    myUdpReadString(sockfd, clientReq, BUFFSIZE, &daddr, NULL);
     
-    myUdpWriteBytes(sockfd, (void*)bufferReply, numberOfReadBytes, daddr);
+    myUdpWriteString(sockfd, clientReq, daddr);
     
   }
 }

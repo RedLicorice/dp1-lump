@@ -66,6 +66,27 @@ void myUdpWriteBytes(SOCKET sockfd, void *data, int byteCount, struct sockaddr_i
   Sendto(sockfd, data, (size_t)byteCount, MSG_NOSIGNAL, (struct sockaddr*)&destStruct, sizeof(struct sockaddr_in));
 }
 
+bool myUdpReadString(SOCKET sockfd, char *buffer, int maxCharCount, struct sockaddr_in *sourceStruct, int *readCharCount) {
+  int readCharCountTmp;
+  bool reply;
+  
+  if (buffer == NULL)
+    buffer = (char*)malloc(sizeof(char) * maxCharCount);
+  
+  reply = myUdpReadBytes(sockfd, (void*)buffer, maxCharCount - 1, sourceStruct, &readCharCountTmp);
+  
+  buffer[readCharCountTmp] = '\0';
+  
+  if (readCharCount != NULL)
+    *readCharCount = readCharCountTmp;
+  
+  return reply;
+}
+
+void myUdpWriteString(SOCKET sockfd, char *string, struct sockaddr_in destStruct) {
+  myUdpWriteBytes(sockfd, (void*)string, strlen(string), destStruct);
+}
+
 bool myUdpLimitClients(struct sockaddr_in clientStruct, int maxDatagrams, int maxClients) {
   static client_t *clientList;
   static int clientListIndex = -1;

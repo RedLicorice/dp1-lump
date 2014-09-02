@@ -24,10 +24,8 @@ int main(int argc, char *argv[]) {
 }
 
 void childTask(SOCKET sockfd) {
-  const int clientReqLen = strlen(GET) + MAXFILENAMELENGTH + strlen("\r\n");
-  char clientReq[clientReqLen];
+  char clientReq[BUFFSIZE], nomeFile[MAXFILENAMELENGTH];
   uint32_t fileSize;
-  char nomeFile[MAXFILENAMELENGTH];
   
   struct timespec begin, end;
   int numberOfElapsedSeconds;
@@ -39,7 +37,7 @@ void childTask(SOCKET sockfd) {
   
   while (1) {
     
-    if (myTcpReadLine(sockfd, clientReq, clientReqLen - 1, NULL) == false)
+    if (myTcpReadLine(sockfd, clientReq, BUFFSIZE, NULL) == false)
       return;
     
     if (strcmp(clientReq, QUIT) == 0) {
@@ -49,8 +47,8 @@ void childTask(SOCKET sockfd) {
     
     // else: clientReq = GET...
     
-    strcpy(nomeFile, clientReq + 3);
-    nomeFile[strlen(nomeFile) - 2] = '\0';
+    strcpy(nomeFile, clientReq + strlen(GET));
+    nomeFile[strlen(nomeFile) - strlen("\r\n")] = '\0';
     
     if (fileExists(nomeFile) == false) {
       myWarning("The file does not exist", "childTask");
@@ -61,7 +59,7 @@ void childTask(SOCKET sockfd) {
       myTcpWriteString(sockfd, OK);
       
       fileSize = htonl(getFileSize(nomeFile));
-      myTcpWriteBytes(sockfd, (void*)(&fileSize), 4);
+      myTcpWriteBytes(sockfd, (void*)(&fileSize), sizeof(uint32_t));
       
       myTcpReadFromFileAndWriteChunks(sockfd, nomeFile);
       myWarning("File sent successfully to the client...", "childTask");

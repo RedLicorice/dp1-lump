@@ -47,9 +47,9 @@ int main(int argc, char *argv[]) {
 }
 
 bool freeSocket(SOCKET sockfd, char *fileName, enum status_t *status, bool flagQuit) {
-  static char serverRes[7]; // 7 = max(strlen(OK), strlen(ERR)) + 1
+  static char serverRes[BUFFSIZE];
   static int readByteCount;
-  static uint32_t numberOfBytes; // unsigned long int
+  static uint32_t fileSize; // unsigned long int
   
   switch (*status) {
     case init:
@@ -59,7 +59,7 @@ bool freeSocket(SOCKET sockfd, char *fileName, enum status_t *status, bool flagQ
       
       
     case okErr:
-      if (myTcpReadLineAsync(sockfd, serverRes, 6, &readByteCount) == false)
+      if (myTcpReadLineAsync(sockfd, serverRes, BUFFSIZE, &readByteCount) == false)
 	return true;
       
       if (strcmp(serverRes, ERR) == 0)
@@ -71,11 +71,11 @@ bool freeSocket(SOCKET sockfd, char *fileName, enum status_t *status, bool flagQ
       
       
     case size:
-      if (myTcpReadBytesAsync(sockfd, (void*)&numberOfBytes, sizeof(uint32_t), &readByteCount) == false)
+      if (myTcpReadBytesAsync(sockfd, (void*)&fileSize, sizeof(uint32_t), &readByteCount) == false)
 	return true;
       
-      numberOfBytes = ntohl(numberOfBytes); // network-to-host long
-      // HP: numberOfBytes > 0
+      fileSize = ntohl(fileSize); // network-to-host long
+      // HP: fileSize > 0
 	
       readByteCount = 0;
       *status = file;
@@ -83,7 +83,7 @@ bool freeSocket(SOCKET sockfd, char *fileName, enum status_t *status, bool flagQ
       
       
     case file:
-      if (myTcpReadChunksAndWriteToFileAsync(sockfd, fileName, numberOfBytes, &readByteCount) == false)
+      if (myTcpReadChunksAndWriteToFileAsync(sockfd, fileName, fileSize, &readByteCount) == false)
 	return true;
       
       if (flagQuit == true)

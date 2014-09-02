@@ -30,8 +30,8 @@ void myTcpWriteBytes(SOCKET sockfd, void *data, int byteCount);
 
 /** @brief Riceve una stringa.
  * @param sockfd Il file descriptor del socket da cui leggere i dati.
- * @retval buffer Il buffer in cui scrivere la stringa ricevuta (dimensione @p charCount + 1). Se è uguale a NULL, il buffer viene allocato dinamicamente.
- * @param charCount Il numero di caratteri della stringa da ricevere (escluso @c \\0).
+ * @retval buffer Il buffer in cui scrivere la stringa ricevuta (dimensione @p charCount). Se è uguale a NULL, il buffer viene allocato dinamicamente.
+ * @param charCount Il numero di caratteri della stringa da ricevere (incluso @c \\0).
  * @retval readCharCount Il numero di caratteri letti (escluso @c \\0). Se viene passato NULL, questo parametro viene ignorato.
  * @return Restituisce true se tutta la stringa è stata letta. Restituisce false se è stato raggiunto l'end-of-file (numero di caratteri letti minore di @p charCount).
  */
@@ -45,8 +45,8 @@ void myTcpWriteString(SOCKET sockfd, char *string);
 
 /** @brief Riceve una riga terminata con il carattere @c \\n. La lettura non è bufferizzata.
  * @param sockfd Il file descriptor del socket da cui leggere la riga.
- * @retval buffer Il buffer in cui scrivere la riga ricevuta (lunghezza @p maxLength + 1). Se è uguale a NULL, il buffer viene allocato dinamicamente.
- * @param maxLength Il numero massimo di caratteri della riga da ricevere (escluso @c \\0).
+ * @retval buffer Il buffer in cui scrivere la riga ricevuta (lunghezza @p maxLength). Se è uguale a NULL, il buffer viene allocato dinamicamente.
+ * @param maxLength Il numero massimo di caratteri della riga da ricevere (incluso @c \\0).
  * @retval readCharCount Il numero di caratteri letti (escluso @c \\0). Se viene passato NULL, questo parametro viene ignorato.
  * @return Restituisce true se è stato trovato il carattere @c \\n. Restituisce false se sono stati letti @p maxLength caratteri senza trovare il carattere @c \\n oppure è stato raggiunto l'end-of-file (numero di caratteri letti minore di @p maxLength).
  */
@@ -54,8 +54,8 @@ bool myTcpReadLine(SOCKET sockfd, char *buffer, int maxLength, int *readCharCoun
 
 /** @brief Riceve una riga terminata con il carattere @c \\n. La lettura è bufferizzata.
  * @param sockfd Il file descriptor del socket da cui leggere la riga.
- * @retval buffer Il buffer in cui scrivere la riga ricevuta (lunghezza @p maxLength + 1). Se è uguale a NULL, il buffer viene allocato dinamicamente.
- * @param maxLength Il numero massimo di caratteri della riga da ricevere (escluso @c \\0).
+ * @retval buffer Il buffer in cui scrivere la riga ricevuta (lunghezza @p maxLength). Se è uguale a NULL, il buffer viene allocato dinamicamente.
+ * @param maxLength Il numero massimo di caratteri della riga da ricevere (incluso @c \\0).
  * @return Restituisce il numero di caratteri letti (escluso @c \\0).
  * @warning Non mischiare questa funzione con le funzioni di lettura non bufferizzate.
  */
@@ -132,8 +132,8 @@ bool myTcpReadBytesAsync(SOCKET sockfd, void *buffer, int byteCount, int *readBy
 
 /** @brief Riceve una stringa. Effettua un tentativo di lettura alla volta.
  * @param sockfd Il file descriptor del socket da cui leggere i dati.
- * @retval buffer Il buffer in cui scrivere la stringa ricevuta (dimensione @p charCount + 1). Se è uguale a NULL, il buffer viene allocato dinamicamente.
- * @param charCount Il numero di caratteri della stringa da ricevere (escluso @c \\0).
+ * @retval buffer Il buffer in cui scrivere la stringa ricevuta (dimensione @p charCount). Se è uguale a NULL, il buffer viene allocato dinamicamente.
+ * @param charCount Il numero di caratteri della stringa da ricevere (incluso @c \\0).
  * @retval readCharCount Il numero di caratteri letti (escluso @c \\0). Non è possibile passare NULL.
  * @return Restituisce true se tutta la stringa è stata letta oppure è stato raggiunto l'end-of-file (numero di caratteri letti minore di @p charCount). Restituisce false se l'operazione di ricezione non è ancora stata completata.
  * @warning Prima di iniziare una nuova operazione di ricezione, è necessario inizializzare a 0 la variabile passata come parametro @p readCharCount.
@@ -142,8 +142,8 @@ bool myTcpReadStringAsync(SOCKET sockfd, char *buffer, int charCount, int *readC
 
 /** @brief Riceve una riga terminata con il carattere @c \\n. Effettua un tentativo di lettura alla volta. La lettura non è bufferizzata.
  * @param sockfd Il file descriptor del socket da cui leggere la riga.
- * @retval buffer Il buffer in cui scrivere la riga ricevuta (lunghezza @p maxLength + 1). Se è uguale a NULL, il buffer viene allocato dinamicamente.
- * @param maxLength Il numero massimo di caratteri della riga da ricevere (escluso @c \\0).
+ * @retval buffer Il buffer in cui scrivere la riga ricevuta (lunghezza @p maxLength). Se è uguale a NULL, il buffer viene allocato dinamicamente.
+ * @param maxLength Il numero massimo di caratteri della riga da ricevere (incluso @c \\0).
  * @retval readCharCount Il numero di caratteri letti (escluso @c \\0). Non è possibile passare NULL.
  * @return Restituisce true se è stato trovato il carattere @c \\n, sono stati letti @p maxLength caratteri senza trovare il carattere @c \\n oppure è stato raggiunto l'end-of-file (numero di caratteri letti minore di @p maxLength). Restituisce false se l'operazione di ricezione non è ancora stata completata.
  * @warning Prima di iniziare una nuova operazione di ricezione, è necessario inizializzare a 0 la variabile passata come parametro @p readCharCount.
@@ -161,7 +161,7 @@ bool myTcpReadLineAsync(SOCKET sockfd, char *buffer, int maxLength, int *readCha
  */
 bool myTcpReadChunksAsync(SOCKET sockfd, int byteCount, int *readByteCount, myTcpReadChunksCallback callback, void *callbackParam);
 
-/** @brief Riceve fino a @p byteCount byte di dati, un chunk per volta, e li scrive in un file.
+/** @brief Riceve fino a @p byteCount byte di dati, un chunk per volta, e li scrive in un file. Effettua un tentativo di lettura alla volta.
  * @param sockfd Il file descriptor del socket da cui leggere i dati.
  * @param filePath Il percorso del file in cui scrivere i dati letti.
  * @param fileSize Il numero di byte di dati da ricevere.
