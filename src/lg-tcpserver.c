@@ -45,6 +45,7 @@ void myTcpServerSimple(SOCKET sockfd, myTcpServerChildTask childTask) {
     myWarning("Server on listening...", "myTcpServerSimple");
     
     sockfd_copy = myTcpServerAccept(sockfd, &clientAddr);
+    myWarning("Client accepted", "myTcpServerSimple");
     
     childTask(sockfd_copy);
     
@@ -67,6 +68,7 @@ void myTcpServerOCPC(SOCKET sockfd, myTcpServerChildTask childTask) {
     myWarning("Server on listening...  [%d children]", "myTcpServerOCPC", numChildren);
     
     sockfd_copy = myTcpServerAccept(sockfd, &clientAddr);
+    myWarning("Client accepted", "myTcpServerOCPC");
     
     childpid = fork();
     if (childpid == -1)
@@ -110,6 +112,7 @@ void myTcpServerOCPCMax(SOCKET sockfd, int maxChildCount, myTcpServerChildTask c
     myWarning("Server on listening...  [%d children]", "myTcpServerOCPCMax", numChildren);
     
     sockfd_copy = myTcpServerAccept(sockfd, &clientAddr);
+    myWarning("Client accepted", "myTcpServerOCPCMax");
     
     childpid = fork();
     if (childpid == -1)
