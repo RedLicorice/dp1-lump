@@ -1,5 +1,4 @@
 #include "../lunp.h"
-#include <rpc/xdr.h>
 
 #define SERVER_PORT_ARG argv[1] // server port
 
@@ -20,15 +19,21 @@ void childTask(SOCKET sockfd) {
   XDR xdrs1, xdrs2;
   FILE *fd1, *fd2;
   
-  // CLIENT QUERY
+  // CLIENT REQUEST
   fd1 = fdopen(sockfd, "r");
   xdrstdio_create(&xdrs1, fd1, XDR_DECODE);
   
-  if (xdr_int(&xdrs1, &num1) == 0)
-    myFunctionError("xdr_int", NULL, "childTask");
+  if (xdr_int(&xdrs1, &num1) == 0) {
+    myFunctionWarning("xdr_int", NULL, "childTask");
+    xdr_destroy(&xdrs1);
+    return;
+  }
   
-  if (xdr_int(&xdrs1, &num2) == 0)
-    myFunctionError("xdr_int", NULL, "childTask");
+  if (xdr_int(&xdrs1, &num2) == 0) {
+    myFunctionWarning("xdr_int", NULL, "childTask");
+    xdr_destroy(&xdrs1);
+    return;
+  }
   
   xdr_destroy(&xdrs1);
   
@@ -38,8 +43,11 @@ void childTask(SOCKET sockfd) {
   fd2 = fdopen(sockfd, "w");
   xdrstdio_create(&xdrs2, fd2, XDR_ENCODE);
   
-  if (xdr_int(&xdrs2, &result) == 0)
-    myFunctionError("xdr_int", NULL, "main");
+  if (xdr_int(&xdrs2, &result) == 0) {
+    myFunctionWarning("xdr_int", NULL, "childTask");
+    xdr_destroy(&xdrs2);
+    return;
+  }
   
   fflush(fd2);
   xdr_destroy(&xdrs2);

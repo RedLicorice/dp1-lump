@@ -556,6 +556,8 @@ typedef enum bool_t bool;
 
 #define DEFAULT_CHUNK_SIZE 256
 
+#include <rpc/xdr.h>
+
 #include "lunp_lg-other.h"
 #include "lunp_lg-tcp.h"
 #include "lunp_lg-tcpserver.h"

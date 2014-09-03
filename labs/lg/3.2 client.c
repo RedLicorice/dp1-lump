@@ -62,8 +62,10 @@ bool freeSocket(SOCKET sockfd, char *fileName, enum status_t *status, bool flagQ
       if (myTcpReadLineAsync(sockfd, serverRes, BUFFSIZE, &readByteCount) == false)
 	return true;
       
-      if (strcmp(serverRes, ERR) == 0)
-	return myWarning("Illegal command or non-existing file", "freeSocket");
+      if (strcmp(serverRes, ERR) == 0) {
+	myWarning("Illegal command or non-existing file", "freeSocket");
+	return true; // next file
+      }
       
       readByteCount = 0;
       *status = size;

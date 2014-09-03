@@ -1,5 +1,4 @@
 #include "../lunp.h"
-#include <rpc/xdr.h>
 
 #define SERVER_ADDRESS_ARG argv[1] // server address
 #define SERVER_PORT_ARG argv[2] // server port
@@ -18,7 +17,7 @@ int main(int argc, char *argv[]) {
   printf("Please type the second number: ");
   scanf("%d", &num2);
   
-  // CLIENT QUERY
+  // CLIENT RESPONSE
   xdrmem_create(&xdrs1, clientReq, BUFFSIZE, XDR_ENCODE);
   
   if (xdr_int(&xdrs1, &num1) == 0)

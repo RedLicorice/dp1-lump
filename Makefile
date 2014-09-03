@@ -36,8 +36,8 @@ copylunp: clean
 
 clean:
 	@clear
-	@rm -f test/*.c
-	@find test/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec rm \{} \;
+	@find test/ -mindepth 1 -maxdepth 1 -name *.c -and ! -name types.c -exec rm -f \{} \;
+	@find test/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -and ! -name types.h -exec rm -f \{} \;
 
 doxygen:
 	doxygen Doxyfile

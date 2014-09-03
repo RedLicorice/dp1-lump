@@ -19,9 +19,6 @@ void childTask(SOCKET sockfd) {
   uint16_t op1, op2;
   uint32_t result;
   
-  printf("\n");
-  myWarning("Connection accepted", "childTask");
-  
   while (1) {
     
     if (myTcpReadLine(sockfd, clientReq, BUFFSIZE, NULL) == false)

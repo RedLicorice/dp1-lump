@@ -18,9 +18,6 @@ void childTask(SOCKET sockfd) {
   char clientReq[BUFFSIZE], nomeFile[MAXFILENAMELENGTH];
   uint32_t fileSize;
   
-  printf("\n");
-  myWarning("Connection accepted", "childTask");
-  
   while (1) {
     
     if (myTcpReadLine(sockfd, clientReq, BUFFSIZE, NULL) == false)

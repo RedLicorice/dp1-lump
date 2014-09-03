@@ -32,9 +32,6 @@ void childTask(SOCKET sockfd) {
   
   clock_gettime(CLOCK_REALTIME, &begin);
   
-  printf("\n");
-  myWarning("Connection accepted", "childTask");
-  
   while (1) {
     
     if (myTcpReadLine(sockfd, clientReq, BUFFSIZE, NULL) == false)
@@ -64,7 +61,7 @@ void childTask(SOCKET sockfd) {
       myTcpReadFromFileAndWriteChunks(sockfd, nomeFile);
       myWarning("File sent successfully to the client...", "childTask");
     }
-	  
+
     clock_gettime(CLOCK_REALTIME, &end);
     numberOfElapsedSeconds = (int)(end.tv_sec - begin.tv_sec);
     if (numberOfElapsedSeconds > MAX_SECOND_COUNT) {
