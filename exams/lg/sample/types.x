@@ -1,19 +1,14 @@
-enum clientMessage_t {
-  GET = 1,
-  QUIT = 0
+enum operation {
+  QUIT = 0,
+  GET = 1
 };
 
-struct clientReq_t {
-  clientMessage_t message;
-  string fileName<>;
+struct Request {
+  string data<>; /* file name */
+  operation op;
 };
 
-enum serverMessage_t {
-  OK = 1,
-  ERR = 0
-};
-
-struct serverRes_t {
-  serverMessage_t message;
-  opaque fileData_t<>;
+struct Response {
+  bool success;
+  opaque data<>; /* file contents */
 };

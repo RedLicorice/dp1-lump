@@ -1,0 +1,31 @@
+   LAB 1.4
+* client invia datagramma ad una porta su cui il server non è in ascolto
+Viene inviato il pacchetto UDP, viene inviato in risposta un pacchetto ICMP con type = 3 (Destination unreachable) e code = 3 (Port unreachable), quindi il timeout della select() nel client scade.
+
+* client invia datagramma ad un indirizzo non raggiungibile (es. 10.0.0.1)
+Il pacchetto UDP non viene neanche inviato e il timeout della select() nel client scade.
+
+   LAB 2.1
+* client invia datagramma ad una porta su cui il server non è in ascolto
+Per ogni tentativo, viene inviato il pacchetto UDP, viene inviato in risposta un pacchetto ICMP con type = 3 (Destination unreachable) e code = 3 (Port unreachable), quindi il timeout della select() nel client scade.
+
+* client invia datagramma ad un indirizzo non raggiungibile (es. 10.0.0.1)
+Per ogni tentativo, il pacchetto UDP non viene neanche inviato e il timeout della select() nel client scade.
+
+  LAB 2.3
+* Mentre è in corso un collegamento provare ad attivare un secondo client verso il medesimo server.
+Il secondo client si connette e manda la richiesta con successo, e il server risponde con degli ACK senza dati, quindi il secondo client si mette in attesa di ricevere dati. Quando il primo client viene chiuso, il server accetta la connessione con il secondo client e serve la richiesta del client.
+
+* Provare ad attivare sul medesimo nodo una seconda istanza del server sulla medesima porta.
+bind(): Address already in use
+
+* Provare a collegare il client ad un indirizzo non raggiungibile.
+Il client si pone in attesa infinita sulla chiamata alla funzione connect().
+
+* Provare a collegare il client ad un indirizzo esistente ma ad una porta su cui il server non è in ascolto.
+Viene mandato in risposta un pacchetto TCP con il flag Reset settato.
+tcp_connect error for 127.0.0.1, 1501: Connection refused
+
+* Provare a disattivare il server (battendo ^C nella sua finestra) mentre un client è collegato.
+Viene mandato in risposta un pacchetto TCP con il flag Reset settato.
+writen error: Broken pipe

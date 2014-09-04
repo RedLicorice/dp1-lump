@@ -12,11 +12,11 @@ compile: copylunp
 	
 client: compile-client
 	@echo "\n\n*******************Launching client...*******************"
-	@./test/socket_client $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
+	@cd test ; ./socket_client $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
 	
 server: compile-server
 	@echo "\n\n*******************Launching server...*******************"
-	@./test/socket_server $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
+	@cd test ; ./socket_server $(filter-out $@,$(MAKECMDGOALS)) # http://stackoverflow.com/a/6273809
 	
 %:      # thanks to chakrit
 	@:    # thanks to William Pursell

@@ -545,7 +545,7 @@ void str_echo(int sockfd);
 
 /************************************************************************/
 /* customized functions                                            */
-/* these functions have been added by Lorenzo David (ldf) to the original unp.c library */
+/* these functions have been added by Luca Ghio (lg) to the original unp.c library */
 /* disclaimer: do not trust them                                        */
 /************************************************************************/
 

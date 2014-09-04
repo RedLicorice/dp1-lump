@@ -1,5 +1,0 @@
-client invia datagramma ad una porta su cui il server non è in ascolto
-Per ogni tentativo, viene inviato il pacchetto UDP, viene inviato in risposta un pacchetto ICMP con type = 3 (Destination unreachable) e code = 3 (Port unreachable), quindi il timeout della select() nel client scade.
-
-client invia datagramma ad un indirizzo non raggiungibile (es. 10.0.0.1)
-Per ogni tentativo, il pacchetto UDP non viene neanche inviato e il timeout della select() nel client scade.

@@ -2,4 +2,3 @@ cscope
 doxygen
 test
 !test/client/client-empty.c
-!test/server/server-empty.c

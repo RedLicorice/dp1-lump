@@ -6,74 +6,103 @@
 
 #define MAXFILENAMELENGTH MAXLINE
 
-void clientTask(SOCKET sockfd, char *fileName, XDR *xdrs_r, XDR *xdrs_w, FILE *fd_w);
+void clientRequest_Get(SOCKET sockfd, char *fileName);
+void clientRequest_Quit(SOCKET sockfd);
+void serverResponse(SOCKET sockfd, char *fileName);
 
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
   char fileName[MAXFILENAMELENGTH];
-  XDR xdrs_w, xdrs_r;
-  FILE *fd_w, *fd_r;
-  clientReq_t clientReq;
   
   sockfd = myTcpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG);
-  
-  fd_w = fdopen(sockfd, "w");
-  xdrstdio_create(&xdrs_w, fd_w, XDR_ENCODE);
-  
-  fd_r = fdopen(sockfd, "r");
-  xdrstdio_create(&xdrs_r, fd_r, XDR_DECODE);
   
   printf("Please type the file name (maximum %d characters, empty string to close): ", MAXFILENAMELENGTH - 1);
   gets(fileName);
   
   while (strcmp(fileName, "") != 0) {
     
-    clientTask(sockfd, fileName, &xdrs_r, &xdrs_w, fd_w);
+    clientRequest_Get(sockfd, fileName);
+  
+    serverResponse(sockfd, fileName);
     
     printf("\nPlease type the file name (maximum %d characters, empty string to close): ", MAXFILENAMELENGTH - 1);
     gets(fileName);
     
   }
   
-  clientReq.message = QUIT;
-  clientReq.fileName = NULL;
-  xdr_clientReq_t(&xdrs_w, &clientReq);
-
-  xdr_destroy(&xdrs_r);
-  xdr_destroy(&xdrs_w);  
+  clientRequest_Quit(sockfd);
+  
   Close(sockfd);
   return 0;
 }
 
-void clientTask(SOCKET sockfd, char *fileName, XDR *xdrs_r, XDR *xdrs_w, FILE *fd_w) {
-  uint32_t fileSize;
+void clientRequest_Get(SOCKET sockfd, char *fileName) {
+  XDR xdrs;
   FILE *fd;
-  clientReq_t clientReq;
-  serverRes_t serverRes;
+  Request clientReq;
   
-  // CLIENT REQUEST
-  clientReq.message = GET;
-  clientReq.fileName = fileName;
+  clientReq.op = GET;
+  clientReq.data = fileName;
   
-  if (xdr_clientReq_t(xdrs_w, &clientReq) == 0)
-    myFunctionError("xdr_clientReq_t", NULL, "clientTask");
-  fflush(fd_w);
+  fd = fdopen(sockfd, "w");
+  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
   
-  // SERVER RESPONSE
-  serverRes.fileData_t.fileData_t_val = NULL;
+  if (xdr_Request(&xdrs, &clientReq) == FALSE)
+    myFunctionError("xdr_Request", NULL, "clientRequest_Get");
   
-  if (xdr_serverRes_t(xdrs_r, &serverRes) == 0)
-    myFunctionError("xdr_serverRes_t", NULL, "clientTask");
+  fflush(fd);
+  xdr_destroy(&xdrs);
+}
+
+void clientRequest_Quit(SOCKET sockfd) {
+  XDR xdrs;
+  FILE *fd;
+  Request clientReq;
   
-  if (serverRes.message == ERR) {
-    myWarning("Illegal command or non-existing file", "clientTask");
+  clientReq.op = QUIT;
+  clientReq.data = (char*)malloc(0);
+  
+  fd = fdopen(sockfd, "w");
+  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  
+  if (xdr_Request(&xdrs, &clientReq) == FALSE)
+    myFunctionError("xdr_Request", NULL, "clientRequest_Quit");
+  
+  fflush(fd);
+  xdr_destroy(&xdrs);
+  
+  free(clientReq.data);
+}
+
+void serverResponse(SOCKET sockfd, char *fileName) {
+  XDR xdrs;
+  FILE *fd;
+  Response serverRes;
+  
+  u_int fileSize;
+    
+  serverRes.data.data_val = NULL;
+  
+  fd = fdopen(sockfd, "r");
+  xdrstdio_create(&xdrs, fd, XDR_DECODE);
+  
+  if (xdr_Response(&xdrs, &serverRes) == FALSE)
+    myFunctionError("xdr_Response", NULL, "serverResponse");
+  
+  xdr_destroy(&xdrs);
+  
+  if (serverRes.success == FALSE) {
+    myWarning("Illegal command or non-existing file", "serverResponse");
+    free(serverRes.data.data_val);
     return; // next file
   }
     
-  // else: serverRes = OK
-  fileSize = serverRes.fileData_t.fileData_t_len;
+  // else: serverRes.success == TRUE
+  fileSize = serverRes.data.data_len;
   
   fd = fopen(fileName, "w");
-  fwrite((void*)serverRes.fileData_t.fileData_t_val, 1, fileSize, fd);
+  fwrite((void*)serverRes.data.data_val, 1, fileSize, fd);
   fclose(fd);
+  
+  free(serverRes.data.data_val);
 }

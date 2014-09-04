@@ -3,6 +3,8 @@
 #define SERVER_PORT_ARG argv[1] // server port
 
 void childTask(SOCKET sockfd);
+bool clientRequest(SOCKET sockfd, int *num1, int *num2);
+bool serverResponse(SOCKET sockfd, int result);
 
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
@@ -16,39 +18,44 @@ int main(int argc, char *argv[]) {
 
 void childTask(SOCKET sockfd) {
   int num1, num2, result;
-  XDR xdrs1, xdrs2;
-  FILE *fd1, *fd2;
   
-  // CLIENT REQUEST
-  fd1 = fdopen(sockfd, "r");
-  xdrstdio_create(&xdrs1, fd1, XDR_DECODE);
-  
-  if (xdr_int(&xdrs1, &num1) == 0) {
-    myFunctionWarning("xdr_int", NULL, "childTask");
-    xdr_destroy(&xdrs1);
+  if (clientRequest(sockfd, &num1, &num2) == false)
     return;
-  }
-  
-  if (xdr_int(&xdrs1, &num2) == 0) {
-    myFunctionWarning("xdr_int", NULL, "childTask");
-    xdr_destroy(&xdrs1);
-    return;
-  }
-  
-  xdr_destroy(&xdrs1);
-  
+
   result = num1 + num2;
-  
-  // SERVER RESPONSE
-  fd2 = fdopen(sockfd, "w");
-  xdrstdio_create(&xdrs2, fd2, XDR_ENCODE);
-  
-  if (xdr_int(&xdrs2, &result) == 0) {
-    myFunctionWarning("xdr_int", NULL, "childTask");
-    xdr_destroy(&xdrs2);
+
+  if (serverResponse(sockfd, result) == false)
     return;
-  }
+}
+
+bool clientRequest(SOCKET sockfd, int *num1, int *num2) {
+  XDR xdrs;
+  FILE *fd;
   
-  fflush(fd2);
-  xdr_destroy(&xdrs2);
+  fd = fdopen(sockfd, "r");
+  xdrstdio_create(&xdrs, fd, XDR_DECODE);
+  
+  if (xdr_int(&xdrs, num1) == FALSE)
+    return false;
+  
+  if (xdr_int(&xdrs, num2) == FALSE)
+    return false;
+  
+  xdr_destroy(&xdrs);
+  return true;
+}
+
+bool serverResponse(SOCKET sockfd, int result) {
+  XDR xdrs;
+  FILE *fd;
+  
+  fd = fdopen(sockfd, "w");
+  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  
+  if (xdr_int(&xdrs, &result) == FALSE)
+    return false;
+  
+  fflush(fd);
+  xdr_destroy(&xdrs);
+  return true;
 }

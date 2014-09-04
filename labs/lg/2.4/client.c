@@ -3,11 +3,12 @@
 #define SERVER_ADDRESS_ARG argv[1] // server address
 #define SERVER_PORT_ARG argv[2] // server port
 
+void clientRequest(SOCKET sockfd, int num1, int num2);
+void serverResponse(SOCKET sockfd, int *result);
+
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
   int num1, num2, result;
-  XDR xdrs1, xdrs2;
-  FILE *fd1, *fd2;
   
   sockfd = myTcpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG);
   
@@ -17,30 +18,42 @@ int main(int argc, char *argv[]) {
   printf("Please type the second number: ");
   scanf("%d", &num2);
   
-  // CLIENT REQUEST
-  fd1 = fdopen(sockfd, "w");
-  xdrstdio_create(&xdrs1, fd1, XDR_ENCODE);
+  clientRequest(sockfd, num1, num2);
   
-  if (xdr_int(&xdrs1, &num1) == 0)
-    myFunctionError("xdr_int", NULL, "main");
-  
-  if (xdr_int(&xdrs1, &num2) == 0)
-    myFunctionError("xdr_int", NULL, "main");
-  
-  fflush(fd1);
-  xdr_destroy(&xdrs1);
-  
-  // SERVER RESPONSE
-  fd2 = fdopen(sockfd, "r");
-  xdrstdio_create(&xdrs2, fd2, XDR_DECODE);
-  
-  if (xdr_int(&xdrs2, &result) == 0)
-    myFunctionError("xdr_int", NULL, "main");
-  
-  xdr_destroy(&xdrs2);
+  serverResponse(sockfd, &result);
   
   printf("The server replied: %d\n", result);
   
   Close(sockfd);
   return 0;
+}
+
+void clientRequest(SOCKET sockfd, int num1, int num2) {
+  XDR xdrs;
+  FILE *fd;
+  
+  fd = fdopen(sockfd, "w");
+  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  
+  if (xdr_int(&xdrs, &num1) == FALSE)
+    myFunctionError("xdr_int", NULL, "clientRequest");
+  
+  if (xdr_int(&xdrs, &num2) == FALSE)
+    myFunctionError("xdr_int", NULL, "clientRequest");
+  
+  fflush(fd);
+  xdr_destroy(&xdrs);
+}
+
+void serverResponse(SOCKET sockfd, int *result) {
+  XDR xdrs;
+  FILE *fd;
+  
+  fd = fdopen(sockfd, "r");
+  xdrstdio_create(&xdrs, fd, XDR_DECODE);
+  
+  if (xdr_int(&xdrs, result) == FALSE)
+    myFunctionError("xdr_int", NULL, "serverResponse");
+  
+  xdr_destroy(&xdrs);
 }
