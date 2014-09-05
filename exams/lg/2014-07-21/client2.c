@@ -8,10 +8,10 @@
 
 #define OUTPUT_FILE "output.txt"
 #define MAX_SECONDS 3
+#define MAX_RETRANSMISSIONS 3
 
 enum serverResStatus {
   success = 0, // success
-  wrong = 1, // wrong transaction ID or wrong format
   expired = 2 // expired timeout
 };
 typedef enum serverResStatus serverResStatus;
@@ -25,12 +25,21 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in *daddr;
   uint32_t transactionId, result;
   serverResStatus reply;
+  int retransmissionCount;
   
   sockfd = myUdpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG, &daddr);
   
+  retransmissionCount = 1;
+    
+again:
   clientRequest(sockfd, *daddr, TRANSACTION_ID_ARG, OP1_ARG, OP2_ARG, &transactionId);
-  
+    
   reply = serverResponse(sockfd, transactionId, &result);
+    
+  if (reply == expired && retransmissionCount < MAX_RETRANSMISSIONS) {
+    retransmissionCount++;
+    goto again;
+  }
   
   writeOutputFile(reply, result);
   
@@ -54,22 +63,23 @@ void clientRequest(SOCKET sockfd, struct sockaddr_in daddr, char *transactionIdA
 serverResStatus serverResponse(SOCKET sockfd, uint32_t transactionId, uint32_t *result) {
   uint32_t receivedTransactionId, serverResponse[2];
   
+again:
   if (myWaitForSingleObject(MAX_SECONDS, sockfd) == false) {
     myWarning("Expired timeout", "serverResponse");
     return expired;
   }
-  
+    
   if (myUdpReadBytes(sockfd, (void*)&serverResponse, sizeof(uint32_t) * 2, NULL, NULL) == false) {
     myWarning("The number of read bytes is less than the expected one (%d)", "serverResponse", sizeof(uint32_t) * 2);
-    return wrong;
+    goto again;
   }
-  
+   
   myWarning("Response datagram received successfully", "serverResponse");
-  
+      
   receivedTransactionId = ntohl(serverResponse[0]);
   if (receivedTransactionId != transactionId) {
     myWarning("Wrong transaction ID", "serverResponse");
-    return wrong;
+    goto again;
   }
   
   *result = ntohl(serverResponse[1]);
