@@ -551,8 +551,8 @@ void str_echo(int sockfd);
 
 typedef int SOCKET;
 
-enum bool_t { false = 0, true = 1 };
-typedef enum bool_t bool;
+enum bool { false = 0, true = 1 };
+typedef enum bool bool;
 
 #define DEFAULT_CHUNK_SIZE 256
 
