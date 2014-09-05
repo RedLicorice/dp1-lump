@@ -12,13 +12,13 @@ bool clientTask(SOCKET sockfd, char *name, struct sockaddr_in daddr, char *serve
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
   char serverRes[BUFFSIZE], input[MAXLINE];
-  struct sockaddr_in daddr;
+  struct sockaddr_in *daddr;
 
   sockfd = myUdpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG, &daddr);
   
   do {
   
-    if (clientTask(sockfd, NAME_ARG, daddr, serverRes) == true)
+    if (clientTask(sockfd, NAME_ARG, *daddr, serverRes) == true)
       printf("Reply from server: %s\n", serverRes);
     
     else // false

@@ -17,7 +17,7 @@ SOCKET myTcpServerAccept(SOCKET sockfd, struct sockaddr_in *clientStruct) {
   return Accept(sockfd, (struct sockaddr*)clientStruct, &addrlen);
 }
 
-SOCKET myTcpServerStartup(const char *serverPort) {
+/*SOCKET myTcpServerStartup(const char *serverPort) {
   SOCKET sockfd;
   struct sockaddr_in saddr;
   
@@ -33,6 +33,10 @@ SOCKET myTcpServerStartup(const char *serverPort) {
   Listen(sockfd, 2);
   
   return sockfd;
+}*/
+
+SOCKET myTcpServerStartup(const char *serverPort) {
+  return Tcp_listen(NULL, serverPort, NULL);
 }
 
 void myTcpServerSimple(SOCKET sockfd, myTcpServerChildTask childTask) {
@@ -167,7 +171,7 @@ void myTcpServerPreforked(SOCKET sockfd, int childCount, myTcpServerChildTask ch
   myTcpServerSimple(sockfd, childTask);
 }
 
-void waitForZombieChildren() {
+static void waitForZombieChildren() {
   pid_t childpid;
   
     childpid = waitpid(-1, NULL, WNOHANG);

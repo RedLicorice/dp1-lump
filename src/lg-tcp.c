@@ -7,7 +7,7 @@ static ssize_t readnOnce(int fd, void *vptr, size_t n);
 static ssize_t ReadnOnce(int fd, void *ptr, size_t nbytes);
 
 SOCKET myTcpClientStartup(const char *serverAddress, const char *serverPort) {
-  return Tcp_connect(serverAddress, serverPort); // tcp_connect.c
+  return Tcp_connect(serverAddress, serverPort);
 }
 
 bool myTcpReadBytes(SOCKET sockfd, void *buffer, int byteCount, int *readByteCount) {
@@ -16,7 +16,7 @@ bool myTcpReadBytes(SOCKET sockfd, void *buffer, int byteCount, int *readByteCou
   if (buffer == NULL)
     buffer = (void*)malloc(sizeof(void) * byteCount);
   
-  readByteCountTmp = Readn(sockfd, buffer, (size_t)byteCount); // readn.c
+  readByteCountTmp = Readn(sockfd, buffer, (size_t)byteCount);
   
   if (readByteCount != NULL)
     *readByteCount = (int)readByteCountTmp;
@@ -28,7 +28,7 @@ bool myTcpReadBytes(SOCKET sockfd, void *buffer, int byteCount, int *readByteCou
 }
 
 void myTcpWriteBytes(SOCKET sockfd, void *data, int byteCount) {
-  Writen(sockfd, data, (size_t)byteCount); // writen.c
+  Writen(sockfd, data, (size_t)byteCount);
 }
 
 bool myTcpReadString(SOCKET sockfd, char *buffer, int charCount, int *readCharCount) {
@@ -82,7 +82,7 @@ bool myTcpReadLine(SOCKET sockfd, char *buffer, int maxLength, int *readCharCoun
 int myTcpBufferedReadLine(SOCKET sockfd, char *buffer, int maxLength) {
   if (buffer == NULL)
     buffer = (char*)malloc(sizeof(char) * maxLength);
-  return (int)Readline(sockfd, (void*)buffer, (size_t)maxLength) - 1; // readline.c
+  return (int)Readline(sockfd, (void*)buffer, (size_t)maxLength) - 1;
 }
 
 bool myTcpReadChunks(SOCKET sockfd, int byteCount, int *readByteCount, myTcpReadChunksCallback callback, void *callbackParam) {
@@ -148,7 +148,7 @@ bool myTcpReadChunksAndWriteToFile(SOCKET sockfd, const char *filePath, int file
   return reply;
 }
 
-bool myTcpReadChunksAndWriteToFileCallback(void *chunk, int chunkSize, void *param) {
+static bool myTcpReadChunksAndWriteToFileCallback(void *chunk, int chunkSize, void *param) {
   if (fwrite(chunk, 1, chunkSize, (FILE*)param) != chunkSize)
     return myFunctionWarning("fwrite", "myTcpReadChunksAndWriteToFileCallback", NULL);
   return true;
@@ -185,7 +185,7 @@ int myTcpReadFromFileAndWriteChunks(SOCKET sockfd, const char *filePath) {
   return numberOfWrittenBytes;
 }
 
-bool myTcpReadFromFileAndWriteChunksCallback(void *chunk, int *chunkSize, void *param) {
+static bool myTcpReadFromFileAndWriteChunksCallback(void *chunk, int *chunkSize, void *param) {
   *chunkSize = 1;
   if (fread(chunk, 1, 1, (FILE*)param) > 0)
     return true;
@@ -199,7 +199,7 @@ bool myTcpReadBytesOnce(SOCKET sockfd, void *buffer, int maxByteCount, int *read
   if (buffer == NULL)
     buffer = (void*)malloc(sizeof(void) * maxByteCount);
   
-  readByteCountTmp = ReadnOnce(sockfd, buffer, (size_t)maxByteCount); // readn.c
+  readByteCountTmp = ReadnOnce(sockfd, buffer, (size_t)maxByteCount);
   
   if (readByteCount != NULL)
     *readByteCount = (int)readByteCountTmp;
@@ -339,7 +339,7 @@ bool myTcpReadChunksAndWriteToFileAsync(SOCKET sockfd, const char *filePath, int
   return reply;
 }
 
-ssize_t readnOnce(int fd, void *vptr, size_t n) {
+static ssize_t readnOnce(int fd, void *vptr, size_t n) {
 	size_t	nleft;
 	ssize_t	nread;
 	char	*ptr;
@@ -362,7 +362,7 @@ ssize_t readnOnce(int fd, void *vptr, size_t n) {
 	return(n - nleft);		/* return >= 0 */
 }
 
-ssize_t ReadnOnce(int fd, void *ptr, size_t nbytes) {
+static ssize_t ReadnOnce(int fd, void *ptr, size_t nbytes) {
 	ssize_t		n;
 
 	if ( (n = readnOnce(fd, ptr, nbytes)) == -1)

@@ -15,13 +15,13 @@ void writeOutputFile(int reply, uint32_t result);
 
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
-  struct sockaddr_in daddr;
+  struct sockaddr_in *daddr;
   uint32_t transactionId, result;
   int reply;
   
   sockfd = myUdpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG, &daddr);
   
-  clientRequest(sockfd, daddr, TRANSACTION_ID_ARG, OP1_ARG, OP2_ARG, &transactionId);
+  clientRequest(sockfd, *daddr, TRANSACTION_ID_ARG, OP1_ARG, OP2_ARG, &transactionId);
   
   reply = serverResponse(sockfd, transactionId, &result);
   

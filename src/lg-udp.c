@@ -1,6 +1,6 @@
 #include "lunp.h"
 
-SOCKET myUdpClientStartup(const char *serverAddress, const char *serverPort, struct sockaddr_in *serverStruct) {
+/*SOCKET myUdpClientStartup(const char *serverAddress, const char *serverPort, struct sockaddr_in *serverStruct) {
   SOCKET sockfd;
   
   sockfd = Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -13,6 +13,11 @@ SOCKET myUdpClientStartup(const char *serverAddress, const char *serverPort, str
     myFunctionError("inet_aton", NULL, "myUdpClientStartup");
   
   return sockfd;
+}*/
+
+SOCKET myUdpClientStartup(const char *serverAddress, const char *serverPort, struct sockaddr_in **serverStruct) {
+  socklen_t junk;
+  return Udp_client(serverAddress, serverPort, (SA**)serverStruct, &junk);
 }
 
 bool myUdpReadBytes(SOCKET sockfd, void *buffer, int maxByteCount, struct sockaddr_in *sourceStruct, int *readByteCount) {

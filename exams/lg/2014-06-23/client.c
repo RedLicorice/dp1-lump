@@ -50,6 +50,8 @@ void clientRequest(SOCKET sockfd, char *operation, char *inputFile) {
   fflush(fd);
   xdr_destroy(&xdrs);
   
+  myWarning("Request sent successfully", "clientRequest");
+  
   free(clientReq.data.data_val);
 }
 
@@ -71,8 +73,10 @@ void serverResponse(SOCKET sockfd) {
   if (serverRes.success == FALSE)
     printf("Error\n");
   
-  else // serverRes.success == TRUE
+  else { // serverRes.success == TRUE
+    myWarning("Response received successfully", "serverResponse");
     writeOutputFile(OUTPUT_FILE, serverRes);
+  }
   
   free(serverRes.data.data_val);
 }

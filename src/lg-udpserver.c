@@ -14,7 +14,7 @@ static bool areSockaddrinEqual(struct sockaddr_in address1, struct sockaddr_in a
 
 static void sigintHandler(int s);
 
-SOCKET myUdpServerStartup(const char *serverPort) {
+/*SOCKET myUdpServerStartup(const char *serverPort) {
   SOCKET sockfd;
   struct sockaddr_in saddr;
   
@@ -28,6 +28,10 @@ SOCKET myUdpServerStartup(const char *serverPort) {
   Bind(sockfd, (struct sockaddr*)&saddr, sizeof(struct sockaddr_in));
   
   return sockfd;
+}*/
+
+SOCKET myUdpServerStartup(const char *serverPort) {
+  return Udp_server(NULL, serverPort, NULL);
 }
 
 void myUdpServerSimple(SOCKET sockfd, myTcpServerChildTask childTask) {
@@ -105,7 +109,7 @@ bool myUdpLimitClients(struct sockaddr_in clientStruct, int maxDatagrams, int ma
   return true;
 }
 
-int searchForClient(struct sockaddr_in clientStruct, client_t *clientList, int clientListIndex) {
+static int searchForClient(struct sockaddr_in clientStruct, client_t *clientList, int clientListIndex) {
   int i;
   for (i = 0; i <= clientListIndex; ++i)
     if (areSockaddrinEqual(clientStruct, clientList[i].clientStruct) == true)
@@ -113,7 +117,7 @@ int searchForClient(struct sockaddr_in clientStruct, client_t *clientList, int c
   return -1;
 }
 
-bool areSockaddrinEqual(struct sockaddr_in struct1, struct sockaddr_in struct2) {
+static bool areSockaddrinEqual(struct sockaddr_in struct1, struct sockaddr_in struct2) {
   if (struct1.sin_family != struct2.sin_family)
     return false;
   if (struct1.sin_port != struct2.sin_port)

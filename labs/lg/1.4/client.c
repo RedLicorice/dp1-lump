@@ -9,11 +9,11 @@
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
   char serverRes[BUFFSIZE];
-  struct sockaddr_in daddr;
+  struct sockaddr_in *daddr;
 
   sockfd = myUdpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG, &daddr);
   
-  myUdpWriteString(sockfd, NAME_ARG, daddr);
+  myUdpWriteString(sockfd, NAME_ARG, *daddr);
 
   if (myWaitForSingleObject(MAX_SECONDS, sockfd) == false)
     myError("Expired timeout", "main");

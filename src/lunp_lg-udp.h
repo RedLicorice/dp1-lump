@@ -11,7 +11,7 @@
  * @retval serverStruct La struttura contenente le informazioni sul server, per le chiamate future alla funzione myUdpSend().
  * @return Restituisce il file descriptor del socket UDP creato.
  */
-SOCKET myUdpClientStartup(const char *serverAddress, const char *serverPort, struct sockaddr_in *serverStruct);
+SOCKET myUdpClientStartup(const char *serverAddress, const char *serverPort, struct sockaddr_in **serverStruct);
 
 /** @brief Riceve fino a @p byteCount byte di dati.
  * @param sockfd Il file descriptor del socket da cui leggere i dati.
