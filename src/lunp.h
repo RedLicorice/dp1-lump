@@ -1,8 +1,5 @@
 /* include unph */
-/** @file
- * @brief Our own header.
- * @details Tabs are set for 4 spaces, not 8
- */
+/* Our own header.  Tabs are set for 4 spaces, not 8 */
 
 #ifndef	__unp_h
 #define	__unp_h
@@ -121,33 +118,29 @@
    an adequately sized buffer without #ifdefs in the code. */
 //#ifndef INET6_ADDRSTRLEN
 /* $$.Ic INET6_ADDRSTRLEN$$ */
-/** @brief max size of IPv6 address string:
- * @details "xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx" @n
- * or "xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:ddd.ddd.ddd.ddd\0" @n
- * 1234567890123456789012345678901234567890123456
- */
-#define	INET6_ADDRSTRLEN	46
+#define	INET6_ADDRSTRLEN	46	/* max size of IPv6 address string:
+				   "xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx" or
+				   "xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:ddd.ddd.ddd.ddd\0"
+				    1234567890123456789012345678901234567890123456 */
 //#endif
 /* *INDENT-ON* */
 
+/* Define bzero() as a macro if it's not in standard C library. */
 //#ifndef	HAVE_BZERO
-/** @brief Define bzero() as a macro if it's not in standard C library. */
 #define	bzero(ptr,n)		memset(ptr, 0, n)
 /* $$.If bzero$$ */
 /* $$.If memset$$ */
 //#endif
 
+/* Older resolvers do not have gethostbyname2() */
 //#ifndef	HAVE_GETHOSTBYNAME2
-/** @brief Older resolvers do not have gethostbyname2() */
 #define	gethostbyname2(host,family)		gethostbyname((host))
 //#endif
 
-/** @brief The structure returned by recvfrom_flags() */
+/* The structure returned by recvfrom_flags() */
 struct unp_in_pktinfo {
-  /** @brief dst IPv4 address */
-  struct in_addr	ipi_addr;
-  /** @brief received interface index */
-  int				ipi_ifindex;
+  struct in_addr	ipi_addr;	/* dst IPv4 address */
+  int				ipi_ifindex;/* received interface index */
 };
 /* $$.It unp_in_pktinfo$$ */
 /* $$.Ib ipi_addr$$ */
@@ -246,8 +239,7 @@ struct unp_in_pktinfo {
 #define	DIR_MODE	(FILE_MODE | S_IXUSR | S_IXGRP | S_IXOTH)
 					/* default permissions for new directories */
 
-/** @brief for signal handlers */
-typedef	void	Sigfunc(int);
+typedef	void	Sigfunc(int);	/* for signal handlers */
 
 #define	min(a,b)	((a) < (b) ? (a) : (b))
 #define	max(a,b)	((a) > (b) ? (a) : (b))
@@ -258,10 +250,8 @@ typedef	void	Sigfunc(int);
 
 //#ifndef	HAVE_IF_NAMEINDEX_STRUCT
 struct if_nameindex {
-  /** @brief 1, 2, ... */
-  unsigned int   if_index;
-  /** @brief null-terminated name: "le0", ... */
-  char          *if_name;
+  unsigned int   if_index;  /* 1, 2, ... */
+  char          *if_name;   /* null-terminated name: "le0", ... */
 };
 /* $$.It if_nameindex$$ */
 /* $$.Ib if_index$$ */
@@ -523,24 +513,9 @@ void	 err_quit(const char *, ...);
 void	 err_ret(const char *, ...);
 void	 err_sys(const char *, ...);
 
+#include <rpc/xdr.h>
+
 #include "common.h"
-
-
-/************************************************************************/
-/* customized functions                                            */
-/* these functions have been added by Lorenzo David (ldf) to the original unp.c library */
-/* disclaimer: do not trust them                                        */
-/************************************************************************/
-
-#define	LOOPBACK_STR	"127.0.0.1"			/* TCP and UDP */
-
-ssize_t Readexp(int fd, void *ptr, size_t maxlen);
-void str_cli(FILE *fp, int sockfd);
-void str_echo(int sockfd);
-
-#include "lunp_ldf-bread.h"
-#include "lunp_ldf-tcp.h"
-#include "lunp_ldf-udp.h"
 
 
 /************************************************************************/
@@ -556,14 +531,12 @@ typedef enum bool bool;
 
 #define DEFAULT_CHUNK_SIZE 256
 
-#include <rpc/xdr.h>
-
-#include "lunp_lg-other.h"
-#include "lunp_lg-tcp.h"
-#include "lunp_lg-tcpserver.h"
-#include "lunp_lg-udp.h"
-#include "lunp_lg-udpserver.h"
-#include "lunp_lg-error.h"
+#include "myother.h"
+#include "mytcp.h"
+#include "mytcpserver.h"
+#include "myudp.h"
+#include "myudpserver.h"
+#include "myerror.h"
 
 
 #endif	/* __unp_h */
