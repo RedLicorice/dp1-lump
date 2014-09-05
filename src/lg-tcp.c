@@ -1,10 +1,10 @@
 #include "lunp.h"
 
-bool myTcpReadChunksAndWriteToFileCallback(void *chunk, int chunkSize, void *param);
-bool myTcpReadFromFileAndWriteChunksCallback(void *chunk, int *chunkSize, void *param);
+static bool myTcpReadChunksAndWriteToFileCallback(void *chunk, int chunkSize, void *param);
+static bool myTcpReadFromFileAndWriteChunksCallback(void *chunk, int *chunkSize, void *param);
 
-ssize_t readnOnce(int fd, void *vptr, size_t n);
-ssize_t ReadnOnce(int fd, void *ptr, size_t nbytes);
+static ssize_t readnOnce(int fd, void *vptr, size_t n);
+static ssize_t ReadnOnce(int fd, void *ptr, size_t nbytes);
 
 SOCKET myTcpClientStartup(const char *serverAddress, const char *serverPort) {
   return Tcp_connect(serverAddress, serverPort); // tcp_connect.c
@@ -365,7 +365,7 @@ ssize_t readnOnce(int fd, void *vptr, size_t n) {
 ssize_t ReadnOnce(int fd, void *ptr, size_t nbytes) {
 	ssize_t		n;
 
-	if ( (n = readn(fd, ptr, nbytes)) == -1)
+	if ( (n = readnOnce(fd, ptr, nbytes)) == -1)
 		err_sys("readnOnce error");
 	return(n);
 }

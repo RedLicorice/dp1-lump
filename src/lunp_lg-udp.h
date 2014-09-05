@@ -13,12 +13,6 @@
  */
 SOCKET myUdpClientStartup(const char *serverAddress, const char *serverPort, struct sockaddr_in *serverStruct);
 
-/** @brief Crea un socket UDP associato alla porta specificata.
- * @param serverPort La porta del server a cui associare il socket creato.
- * @return Restituisce il file descriptor del socket UDP creato.
- */
-SOCKET myUdpServerStartup(const char *serverPort);
-
 /** @brief Riceve fino a @p byteCount byte di dati.
  * @param sockfd Il file descriptor del socket da cui leggere i dati.
  * @retval buffer Il buffer in cui scrivere i dati ricevuti (dimensione @p byteCount). Se è uguale a NULL, il buffer viene allocato dinamicamente.
@@ -53,13 +47,5 @@ bool myUdpReadString(SOCKET sockfd, char *buffer, int maxCharCount, struct socka
  * @param destStruct La struttura contenente le informazioni sulla destinazione a cui inviare i dati.
  */
 void myUdpWriteString(SOCKET sockfd, char *string, struct sockaddr_in destStruct);
-
-/** @brief Verifica che non siano stati ricevuti più di @p maxDatagrams datagrammi dal client @p clientStruct.
- * @param clientStruct La struttura contenente le informazioni sul client da cui i dati sono stati ricevuti.
- * @param maxDatagrams Il numero massimo di datagrammi che può essere ricevuto dal client @p clientStruct.
- * @param maxClients Il numero massimo di client da riconoscere.
- * @returns Restituisce false se sono stati ricevuti più di @p maxDatagrams datagrammi dal client @p clientStruct, altrimenti restituisce true.
- */
-bool myUdpLimitClients(struct sockaddr_in clientStruct, int maxDatagrams, int maxClients);
 
 #endif

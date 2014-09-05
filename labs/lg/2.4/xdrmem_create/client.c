@@ -50,12 +50,11 @@ void clientRequest(SOCKET sockfd, int num1, int num2) {
 void serverResponse(SOCKET sockfd, int *result) {
   XDR xdrs;
   char serverRes[BUFFSIZE];
-  int serverResLength;
+  int bufferPos;
   
-  myTcpReadBytes(sockfd, (void*)serverRes, BUFFSIZE, &serverResLength);
-  // WARNING: This returns when the server closes the connection (orderly shutdown). If the server does not close the connection, this never returns.
+  myTcpReadBytesOnce(sockfd, (void*)serverRes, BUFFSIZE, &bufferPos);
   
-  xdrmem_create(&xdrs, serverRes, serverResLength, XDR_DECODE);
+  xdrmem_create(&xdrs, serverRes, bufferPos, XDR_DECODE);
   
   if (xdr_int(&xdrs, result) == FALSE)
     myFunctionError("xdr_int", NULL, "serverResponse");

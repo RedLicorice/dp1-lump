@@ -95,6 +95,9 @@ bool freeSocket(SOCKET sockfd, char *fileName, enum status_t *status, bool flagQ
       fflush(stdout);
       *status = init;
       return true;
+      
+    default:
+      return false;
   }
 }
 

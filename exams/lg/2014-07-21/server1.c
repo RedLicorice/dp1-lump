@@ -5,41 +5,38 @@
 
 int K;
 
+void childTask(SOCKET sockfd);
 bool clientRequest(SOCKET sockfd, struct sockaddr_in *saddr, uint32_t *transactionId, uint32_t *op1, uint32_t *op2);
 bool processClientRequest(uint32_t op1, uint32_t op2, uint32_t *result);
 void serverResponse(SOCKET sockfd, struct sockaddr_in saddr, uint32_t transactionId, uint32_t result);
 
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
-  struct sockaddr_in saddr;
-  uint32_t transactionId, op1, op2, result;
   
   K = atoi(KAPPA_ARG);
   
   sockfd = myUdpServerStartup(SERVER_PORT_ARG);
   
-  while (1) {
-    
-    if (clientRequest(sockfd, &saddr, &transactionId, &op1, &op2) == true) {
-      
-      if (processClientRequest(op1, op2, &result) == true) {
-      
-	serverResponse(sockfd, saddr, transactionId, result);
-      
-      } // else: ignore
-      
-    } // else: ignore
-    
-  }
+  myUdpServerSimple(sockfd, &childTask);
   
-  return 0;
+  return 0; // it shuts down a compiler warning
+}
+
+void childTask(SOCKET sockfd) {
+  struct sockaddr_in saddr;
+  uint32_t transactionId, op1, op2, result;
+  
+  if (clientRequest(sockfd, &saddr, &transactionId, &op1, &op2) == false)
+    return; // ignore
+      
+  if (processClientRequest(op1, op2, &result) == false)
+    return; // ignore
+      
+  serverResponse(sockfd, saddr, transactionId, result);
 }
 
 bool clientRequest(SOCKET sockfd, struct sockaddr_in *saddr, uint32_t *transactionId, uint32_t *op1, uint32_t *op2) {
   uint32_t clientReq[3];
-  
-  printf("\n");
-  myWarning("Server on listening...", "clientRequest");
   
   if (myUdpReadBytes(sockfd, (void*)&clientReq, sizeof(uint32_t) * 3, saddr, NULL) == false) {
     myWarning("The number of read bytes is less than the expected one (%d)", "serverResponse", sizeof(uint32_t) * 3);

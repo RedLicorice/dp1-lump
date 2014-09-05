@@ -2,20 +2,23 @@
 
 #define SERVER_PORT_ARG argv[1] // server port
 
+void childTask(SOCKET sockfd);
+
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
-  char clientReq[BUFFSIZE];
-  struct sockaddr_in daddr;
   
   sockfd = myUdpServerStartup(SERVER_PORT_ARG);
 
-  while (1) {
+  myUdpServerSimple(sockfd, &childTask);
+  
+  return 0; // it shuts down a compiler warning
+}
+
+void childTask(SOCKET sockfd) {
+  char clientReq[BUFFSIZE];
+  struct sockaddr_in daddr;
+  
+  myUdpReadString(sockfd, clientReq, BUFFSIZE, &daddr, NULL);
     
-    myWarning("\nServer on listening on port %d...", NULL, atoi(SERVER_PORT_ARG));
-    
-    myUdpReadString(sockfd, clientReq, BUFFSIZE, &daddr, NULL);
-    
-    myUdpWriteString(sockfd, clientReq, daddr);
-    
-  }
+  myUdpWriteString(sockfd, clientReq, daddr);
 }

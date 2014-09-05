@@ -1,10 +1,10 @@
 #include "lunp.h"
 
-int numChildren = 0;
+static int numChildren = 0;
 
-pid_t *childpids;
+static pid_t *childpids;
 
-void waitForZombieChildren();
+static void waitForZombieChildren();
 
 static void sigusr1Handler(int s);
 static void sigintHandler(int s);
@@ -151,11 +151,9 @@ void myTcpServerPreforked(SOCKET sockfd, int childCount, myTcpServerChildTask ch
     if (childpid == -1)
       mySystemError("fork", "myTcpServerPreforked");
     
-    if (childpid == 0) {
+    if (childpid == 0)
       // child
       myTcpServerSimple(sockfd, childTask);
-      return;
-    }
     
     // father
     childpids[i] = childpid;

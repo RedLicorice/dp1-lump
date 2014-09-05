@@ -33,7 +33,7 @@ void myTcpServerSimple(SOCKET sockfd, myTcpServerChildTask childTask);
 /** @brief Implementa un server TCP che serve più client tramite il fork di più processi figlio, uno per client.
  * @param sockfd Il file descriptor del socket a cui i client si connettono.
  * @param childTask La funzione da chiamare ogni volta che un client si connette al socket @p sockfd.
- * @warning Questa funzione non ritorna mai.
+ * @warning Questa funzione non ritorna mai (nel processo padre).
  */
 void myTcpServerOCPC(SOCKET sockfd, myTcpServerChildTask childTask);
 
@@ -41,7 +41,7 @@ void myTcpServerOCPC(SOCKET sockfd, myTcpServerChildTask childTask);
  * @param sockfd Il file descriptor del socket a cui i client si connettono.
  * @param maxChildCount Il numero massimo di client da servire allo stesso tempo.
  * @param childTask La funzione da chiamare ogni volta che un client si connette al socket @p sockfd.
- * @warning Questa funzione non ritorna mai.
+ * @warning Questa funzione non ritorna mai (nel processo padre).
  */
 void myTcpServerOCPCMax(SOCKET sockfd, int maxChildCount, myTcpServerChildTask childTask);
 
