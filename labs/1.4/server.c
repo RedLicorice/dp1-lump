@@ -19,6 +19,8 @@ void childTask(SOCKET sockfd) {
   struct sockaddr_in daddr;
   
   myUdpReadString(sockfd, clientReq, BUFFSIZE, &daddr, NULL);
+  myWarning("Request datagram received successfully", "childTask");
     
   myUdpWriteString(sockfd, clientReq, daddr);
+  myWarning("Response datagram sent successfully", "childTask");
 }

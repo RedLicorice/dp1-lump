@@ -26,6 +26,10 @@ void childTask(SOCKET sockfd) {
   if (myUdpLimitClients(daddr, MAX_DATAGRAMS, MAX_CLIENTS) == false)
     myWarning("Too many requests from this client", "main");
     
-  else
+  else {
+    myWarning("Request datagram received successfully", "childTask");
+    
     myUdpWriteString(sockfd, clientReq, daddr);
+    myWarning("Response datagram sent successfully", "childTask");
+  }
 }

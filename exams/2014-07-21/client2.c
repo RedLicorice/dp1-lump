@@ -43,6 +43,8 @@ again:
   
   writeOutputFile(reply, result);
   
+  Close(sockfd);
+  free(daddr);
   return 0;
 }
 

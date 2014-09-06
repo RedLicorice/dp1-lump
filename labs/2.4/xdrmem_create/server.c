@@ -32,18 +32,23 @@ bool clientRequest(SOCKET sockfd, int *num1, int *num2) {
   XDR xdrs;
   char clientReq[BUFFSIZE];
   int bufferPos;
+  bool_t success;
   
   myTcpReadBytesOnce(sockfd, (void*)clientReq, BUFFSIZE, &bufferPos);
   
   xdrmem_create(&xdrs, clientReq, bufferPos, XDR_DECODE);
   
-  if (xdr_int(&xdrs, num1) == FALSE)
-    return false;
+  success = xdr_int(&xdrs, num1);
   
-  if (xdr_int(&xdrs, num2) == FALSE)
-    return false;
+  if (success == TRUE)
+    success = xdr_int(&xdrs, num2);
   
   xdr_destroy(&xdrs);
+  
+  if (success == FALSE)
+    return false;
+  
+  myWarning("Request received successfully", "clientRequest");
   return true;
 }
 
@@ -54,12 +59,16 @@ bool serverResponse(SOCKET sockfd, int result) {
   
   xdrmem_create(&xdrs, serverRes, BUFFSIZE, XDR_ENCODE);
   
-  if (xdr_int(&xdrs, &result) == FALSE)
+  if (xdr_int(&xdrs, &result) == FALSE) {
+    xdr_destroy(&xdrs);
     return false;
+  }
   
   bufferPos = xdr_getpos(&xdrs);
   myTcpWriteBytes(sockfd, (void*)serverRes, bufferPos);
   
   xdr_destroy(&xdrs);
+  
+  myWarning("Response sent successfully", "serverResponse");
   return true;
 }

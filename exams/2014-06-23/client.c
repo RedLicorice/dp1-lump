@@ -41,14 +41,15 @@ void clientRequest(SOCKET sockfd, char *operation, char *inputFile) {
   
   readInputFile(inputFile, &clientReq);
   
-  fd = fdopen(sockfd, "w");
+  fd = fdopen(dup(sockfd), "w");
   xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  setbuf(fd, NULL);
   
   if (xdr_Request(&xdrs, &clientReq) == FALSE)
     myFunctionError("xdr_Request", NULL, "clientRequest");
   
-  fflush(fd);
   xdr_destroy(&xdrs);
+  fclose(fd);
   
   myWarning("Request sent successfully", "clientRequest");
   
@@ -62,13 +63,14 @@ void serverResponse(SOCKET sockfd) {
 
   serverRes.data.data_val = NULL;
   
-  fd = fdopen(sockfd, "r");
+  fd = fdopen(dup(sockfd), "r");
   xdrstdio_create(&xdrs, fd, XDR_DECODE);
   
   if (xdr_Response(&xdrs, &serverRes) == FALSE)
     myFunctionError("xdr_Response", NULL, "serverResponse");
   
   xdr_destroy(&xdrs);
+  fclose(fd);
   
   if (serverRes.success == FALSE)
     printf("Error\n");

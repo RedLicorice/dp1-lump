@@ -34,6 +34,8 @@ int main(int argc, char *argv[]) {
   
   writeOutputFile(reply, result);
   
+  Close(sockfd);
+  free(daddr);
   return 0;
 }
 

@@ -63,18 +63,21 @@ void childTask(SOCKET sockfd) {
 bool clientRequest(SOCKET sockfd, Request *clientReq) {
   XDR xdrs;
   FILE *fd;
+  bool_t success;
   
   clientReq->data.data_val = NULL;
   
-  fd = fdopen(sockfd, "r");
+  fd = fdopen(dup(sockfd), "r");
   xdrstdio_create(&xdrs, fd, XDR_DECODE);
   
-  if (xdr_Request(&xdrs, clientReq) == FALSE) {
-    xdr_destroy(&xdrs);
-    return false;
-  }
-    
+  success = xdr_Request(&xdrs, clientReq);
+  
   xdr_destroy(&xdrs);
+  fclose(fd);
+  
+  if (success == FALSE)
+    return false;
+    
   return true;
 }
 
@@ -103,6 +106,7 @@ bool serverResponse_Fail(SOCKET sockfd) {
   XDR xdrs;
   FILE *fd;
   Response serverRes;
+  bool_t success;
   
   myWarning(NULL, "serverResponse_Fail");
   
@@ -110,19 +114,19 @@ bool serverResponse_Fail(SOCKET sockfd) {
   serverRes.data.data_val = (float*)malloc(0);
   serverRes.data.data_len = 0;
   
-  fd = fdopen(sockfd, "w");
+  fd = fdopen(dup(sockfd), "w");
   xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  setbuf(fd, NULL);
     
-  if (xdr_Response(&xdrs, &serverRes) == FALSE) {
-    xdr_destroy(&xdrs);
-    free(serverRes.data.data_val);
-    return false;
-  }
+  success = xdr_Response(&xdrs, &serverRes);
     
-  fflush(fd);
   xdr_destroy(&xdrs);
+  fclose(fd);
   
   free(serverRes.data.data_val);
+  
+  if (success == FALSE)
+    return false;
   
   return true;
 }
@@ -131,6 +135,7 @@ bool serverResponse_Success(SOCKET sockfd, float *data, u_int dataLen) {
   XDR xdrs;
   FILE *fd;
   Response serverRes;
+  bool_t success;
   
   myWarning(NULL, "serverResponse_Success");
   
@@ -138,16 +143,17 @@ bool serverResponse_Success(SOCKET sockfd, float *data, u_int dataLen) {
   serverRes.data.data_val = data;
   serverRes.data.data_len = dataLen;
   
-  fd = fdopen(sockfd, "w");
+  fd = fdopen(dup(sockfd), "w");
   xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  setbuf(fd, NULL);
     
-  if (xdr_Response(&xdrs, &serverRes) == FALSE) {
-    xdr_destroy(&xdrs);
-    return false;
-  }
-    
-  fflush(fd);
+  success = xdr_Response(&xdrs, &serverRes);
+  
   xdr_destroy(&xdrs);
+  fclose(fd);
+  
+  if (success == FALSE)
+    return false;
   
   return true;
 }

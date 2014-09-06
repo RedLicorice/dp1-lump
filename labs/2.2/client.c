@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
   } while (strcmp(input, "") == 0);
 
   Close(sockfd);
+  free(daddr);
   return 0;
 }
 

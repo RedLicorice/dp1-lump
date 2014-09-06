@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
     printf("No replies from server\n");
 
   Close(sockfd);
+  free(daddr);
   return 0;
 }
 

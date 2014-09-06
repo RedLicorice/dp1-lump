@@ -44,14 +44,15 @@ void clientRequest_Get(SOCKET sockfd, char *fileName) {
   clientReq.op = GET;
   clientReq.data = fileName;
   
-  fd = fdopen(sockfd, "w");
+  fd = fdopen(dup(sockfd), "w");
   xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  setbuf(fd, NULL);
   
   if (xdr_Request(&xdrs, &clientReq) == FALSE)
     myFunctionError("xdr_Request", NULL, "clientRequest_Get");
   
-  fflush(fd);
   xdr_destroy(&xdrs);
+  fclose(fd);
 }
 
 void clientRequest_Quit(SOCKET sockfd) {
@@ -62,14 +63,15 @@ void clientRequest_Quit(SOCKET sockfd) {
   clientReq.op = QUIT;
   clientReq.data = (char*)malloc(0);
   
-  fd = fdopen(sockfd, "w");
+  fd = fdopen(dup(sockfd), "w");
   xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  setbuf(fd, NULL);
   
   if (xdr_Request(&xdrs, &clientReq) == FALSE)
     myFunctionError("xdr_Request", NULL, "clientRequest_Quit");
   
-  fflush(fd);
   xdr_destroy(&xdrs);
+  fclose(fd);
   
   free(clientReq.data);
 }
@@ -83,13 +85,14 @@ void serverResponse(SOCKET sockfd, char *fileName) {
     
   serverRes.data.data_val = NULL;
   
-  fd = fdopen(sockfd, "r");
+  fd = fdopen(dup(sockfd), "r");
   xdrstdio_create(&xdrs, fd, XDR_DECODE);
   
   if (xdr_Response(&xdrs, &serverRes) == FALSE)
     myFunctionError("xdr_Response", NULL, "serverResponse");
   
   xdr_destroy(&xdrs);
+  fclose(fd);
   
   if (serverRes.success == FALSE) {
     myWarning("Illegal command or non-existing file", "serverResponse");

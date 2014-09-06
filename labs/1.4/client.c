@@ -23,5 +23,6 @@ int main(int argc, char *argv[]) {
   printf("Reply from server: %s\n", serverRes);
 
   Close(sockfd);
+  free(daddr);
   return 0;
 }

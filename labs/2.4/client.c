@@ -32,8 +32,9 @@ void clientRequest(SOCKET sockfd, int num1, int num2) {
   XDR xdrs;
   FILE *fd;
   
-  fd = fdopen(sockfd, "w");
+  fd = fdopen(dup(sockfd), "w");
   xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  setbuf(fd, NULL);
   
   if (xdr_int(&xdrs, &num1) == FALSE)
     myFunctionError("xdr_int", NULL, "clientRequest");
@@ -41,19 +42,20 @@ void clientRequest(SOCKET sockfd, int num1, int num2) {
   if (xdr_int(&xdrs, &num2) == FALSE)
     myFunctionError("xdr_int", NULL, "clientRequest");
   
-  fflush(fd);
   xdr_destroy(&xdrs);
+  fclose(fd);
 }
 
 void serverResponse(SOCKET sockfd, int *result) {
   XDR xdrs;
   FILE *fd;
   
-  fd = fdopen(sockfd, "r");
+  fd = fdopen(dup(sockfd), "r");
   xdrstdio_create(&xdrs, fd, XDR_DECODE);
   
   if (xdr_int(&xdrs, result) == FALSE)
     myFunctionError("xdr_int", NULL, "serverResponse");
   
   xdr_destroy(&xdrs);
+  fclose(fd);
 }

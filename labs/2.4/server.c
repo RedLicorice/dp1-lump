@@ -31,31 +31,43 @@ void childTask(SOCKET sockfd) {
 bool clientRequest(SOCKET sockfd, int *num1, int *num2) {
   XDR xdrs;
   FILE *fd;
+  bool_t success;
   
-  fd = fdopen(sockfd, "r");
+  fd = fdopen(dup(sockfd), "r");
   xdrstdio_create(&xdrs, fd, XDR_DECODE);
   
-  if (xdr_int(&xdrs, num1) == FALSE)
-    return false;
+  success = xdr_int(&xdrs, num1);
   
-  if (xdr_int(&xdrs, num2) == FALSE)
-    return false;
+  if (success == TRUE)
+    success = xdr_int(&xdrs, num2);
   
   xdr_destroy(&xdrs);
+  fclose(fd);
+  
+  if (success == FALSE)
+    return false;
+
+  myWarning("Request received successfully", "clientRequest");
   return true;
 }
 
 bool serverResponse(SOCKET sockfd, int result) {
   XDR xdrs;
   FILE *fd;
+  bool_t success;
   
-  fd = fdopen(sockfd, "w");
+  fd = fdopen(dup(sockfd), "w");
   xdrstdio_create(&xdrs, fd, XDR_ENCODE);
+  setbuf(fd, NULL);
   
-  if (xdr_int(&xdrs, &result) == FALSE)
-    return false;
-  
-  fflush(fd);
+  success = xdr_int(&xdrs, &result);
+
   xdr_destroy(&xdrs);
+  fclose(fd);
+  
+  if (success == FALSE)
+    return false;
+
+  myWarning("Response sent successfully", "serverResponse");
   return true;
 }
