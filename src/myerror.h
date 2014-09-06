@@ -2,8 +2,8 @@
  * @brief Contiene i wrapper delle funzioni per la stampa degli errori.
  */
 
-#ifndef	__lunp_lg_error_h
-#define	__lunp_lg_error_h
+#ifndef	__myerror_h
+#define	__myerror_h
 
 /** @brief Stampa un messaggio di errore personalizzato, poi termina immediatamente il programma.
  * @param errorMsg Il messaggio di errore da stampare. Se viene passato NULL, questo parametro viene ignorato.

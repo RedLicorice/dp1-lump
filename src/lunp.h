@@ -537,6 +537,7 @@ typedef enum bool bool;
 #include "myudp.h"
 #include "myudpserver.h"
 #include "myerror.h"
+#include "myxdr.h"
 
 
 #endif	/* __unp_h */

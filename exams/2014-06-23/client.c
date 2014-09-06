@@ -30,8 +30,6 @@ int main(int argc, char *argv[]) {
 }
 
 void clientRequest(SOCKET sockfd, char *operation, char *inputFile) {
-  XDR xdrs;
-  FILE *fd;
   Request clientReq;
   
   if (strcmp(operation, ENCODE_OP) == 0)
@@ -41,15 +39,8 @@ void clientRequest(SOCKET sockfd, char *operation, char *inputFile) {
   
   readInputFile(inputFile, &clientReq);
   
-  fd = fdopen(dup(sockfd), "w");
-  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
-  setbuf(fd, NULL);
-  
-  if (xdr_Request(&xdrs, &clientReq) == FALSE)
+  if (myTcpWriteXdr(sockfd, (myXdrFunction)&xdr_Request, (void*)&clientReq) == false)
     myFunctionError("xdr_Request", NULL, "clientRequest");
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
   
   myWarning("Request sent successfully", "clientRequest");
   
@@ -57,20 +48,12 @@ void clientRequest(SOCKET sockfd, char *operation, char *inputFile) {
 }
 
 void serverResponse(SOCKET sockfd) {
-  XDR xdrs;
-  FILE *fd;
   Response serverRes;
 
   serverRes.data.data_val = NULL;
   
-  fd = fdopen(dup(sockfd), "r");
-  xdrstdio_create(&xdrs, fd, XDR_DECODE);
-  
-  if (xdr_Response(&xdrs, &serverRes) == FALSE)
+  if (myTcpReadXdr(sockfd, (myXdrFunction)&xdr_Response, (void*)&serverRes) == false)
     myFunctionError("xdr_Response", NULL, "serverResponse");
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
   
   if (serverRes.success == FALSE)
     printf("Error\n");

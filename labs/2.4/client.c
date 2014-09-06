@@ -29,33 +29,14 @@ int main(int argc, char *argv[]) {
 }
 
 void clientRequest(SOCKET sockfd, int num1, int num2) {
-  XDR xdrs;
-  FILE *fd;
-  
-  fd = fdopen(dup(sockfd), "w");
-  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
-  setbuf(fd, NULL);
-  
-  if (xdr_int(&xdrs, &num1) == FALSE)
+  if (myTcpWriteXdr(sockfd, (myXdrFunction)&xdr_int, (void*)&num1) == false)
     myFunctionError("xdr_int", NULL, "clientRequest");
   
-  if (xdr_int(&xdrs, &num2) == FALSE)
+  if (myTcpWriteXdr(sockfd, (myXdrFunction)&xdr_int, (void*)&num2) == false)
     myFunctionError("xdr_int", NULL, "clientRequest");
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
 }
 
 void serverResponse(SOCKET sockfd, int *result) {
-  XDR xdrs;
-  FILE *fd;
-  
-  fd = fdopen(dup(sockfd), "r");
-  xdrstdio_create(&xdrs, fd, XDR_DECODE);
-  
-  if (xdr_int(&xdrs, result) == FALSE)
+  if (myTcpReadXdr(sockfd, (myXdrFunction)&xdr_int, (void*)result) == false)
     myFunctionError("xdr_int", NULL, "serverResponse");
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
 }

@@ -13,9 +13,6 @@ SOCKET myTcpClientStartup(const char *serverAddress, const char *serverPort) {
 bool myTcpReadBytes(SOCKET sockfd, void *buffer, int byteCount, int *readByteCount) {
   ssize_t readByteCountTmp;
   
-  if (buffer == NULL)
-    buffer = (void*)malloc(sizeof(void) * byteCount);
-  
   readByteCountTmp = Readn(sockfd, buffer, (size_t)byteCount);
   
   if (readByteCount != NULL)
@@ -35,9 +32,6 @@ bool myTcpReadString(SOCKET sockfd, char *buffer, int charCount, int *readCharCo
   int readCharCountTmp;
   bool reply;
   
-  if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * charCount);
-  
   reply = myTcpReadBytes(sockfd, (void*)buffer, charCount - 1, &readCharCountTmp);
   
   buffer[readCharCountTmp] = '\0';
@@ -56,9 +50,6 @@ bool myTcpReadLine(SOCKET sockfd, char *buffer, int maxLength, int *readCharCoun
   char *ptr;
   int readCharCountTmp;
   bool found;
-  
-  if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * maxLength);
   
   ptr = buffer;
   readCharCountTmp = 0;
@@ -80,8 +71,6 @@ bool myTcpReadLine(SOCKET sockfd, char *buffer, int maxLength, int *readCharCoun
 }
 
 int myTcpBufferedReadLine(SOCKET sockfd, char *buffer, int maxLength) {
-  if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * maxLength);
   return (int)Readline(sockfd, (void*)buffer, (size_t)maxLength) - 1;
 }
 
@@ -196,9 +185,6 @@ static bool myTcpReadFromFileAndWriteChunksCallback(void *chunk, int *chunkSize,
 bool myTcpReadBytesOnce(SOCKET sockfd, void *buffer, int maxByteCount, int *readByteCount) {
   ssize_t readByteCountTmp;
   
-  if (buffer == NULL)
-    buffer = (void*)malloc(sizeof(void) * maxByteCount);
-  
   readByteCountTmp = ReadnOnce(sockfd, buffer, (size_t)maxByteCount);
   
   if (readByteCount != NULL)
@@ -230,9 +216,6 @@ bool myTcpReadBytesAsync(SOCKET sockfd, void *buffer, int byteCount, int *readBy
 }
 
 bool myTcpReadStringAsync(SOCKET sockfd, char *buffer, int charCount, int *readCharCount) {
-  if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * charCount);
-  
   if (myTcpReadBytesAsync(sockfd, (void*)buffer, charCount - 1, readCharCount) == true) {
     buffer[*readCharCount] = '\0';
     return true;
@@ -247,9 +230,6 @@ bool myTcpReadLineAsync(SOCKET sockfd, char *buffer, int maxLength, int *readCha
   
   if (readCharCount == NULL)
     myError("Parameter \"readCharCount\" can not be NULL", "myTcpReadLineAsync");
-  
-  if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * maxLength);
   
   if (myTcpReadBytes(sockfd, buffer + *readCharCount, 1, &readCharCountTmp) == false) {
     completed = true; // end-of-file

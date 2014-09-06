@@ -2,8 +2,8 @@
  * @brief Contiene i wrapper di funzioni varie.
  */
 
-#ifndef	__lunp_lg_other_h
-#define	__lunp_lg_other_h
+#ifndef	__myother_h
+#define	__myother_h
 
 /** @brief Attende finché il descrittore di file @p fileDescriptor non diventa pronto oppure l'intervallo di timeout non scade.
  * @param maxSeconds Il numero massimo di secondi per cui attendere che il descrittore diventi pronto. Se viene passato -1, l'intervallo di timeout è infinito e la funzione non ritorna finché il descrittore di file non diventa pronto.

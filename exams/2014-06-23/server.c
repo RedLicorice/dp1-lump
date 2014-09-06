@@ -61,24 +61,9 @@ void childTask(SOCKET sockfd) {
 }
 
 bool clientRequest(SOCKET sockfd, Request *clientReq) {
-  XDR xdrs;
-  FILE *fd;
-  bool_t success;
-  
   clientReq->data.data_val = NULL;
   
-  fd = fdopen(dup(sockfd), "r");
-  xdrstdio_create(&xdrs, fd, XDR_DECODE);
-  
-  success = xdr_Request(&xdrs, clientReq);
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
-  
-  if (success == FALSE)
-    return false;
-    
-  return true;
+  return myTcpReadXdr(sockfd, (myXdrFunction)&xdr_Request, (void*)clientReq);
 }
 
 bool processClientRequest(Request clientReq, float **data, u_int *dataLen) {
@@ -103,10 +88,8 @@ bool processClientRequest(Request clientReq, float **data, u_int *dataLen) {
 }
 
 bool serverResponse_Fail(SOCKET sockfd) {
-  XDR xdrs;
-  FILE *fd;
   Response serverRes;
-  bool_t success;
+  bool success;
   
   myWarning(NULL, "serverResponse_Fail");
   
@@ -114,28 +97,15 @@ bool serverResponse_Fail(SOCKET sockfd) {
   serverRes.data.data_val = (float*)malloc(0);
   serverRes.data.data_len = 0;
   
-  fd = fdopen(dup(sockfd), "w");
-  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
-  setbuf(fd, NULL);
-    
-  success = xdr_Response(&xdrs, &serverRes);
-    
-  xdr_destroy(&xdrs);
-  fclose(fd);
+  success = myTcpWriteXdr(sockfd, (myXdrFunction)&xdr_Response, (void*)&serverRes);
   
   free(serverRes.data.data_val);
   
-  if (success == FALSE)
-    return false;
-  
-  return true;
+  return success;
 }
 
 bool serverResponse_Success(SOCKET sockfd, float *data, u_int dataLen) {
-  XDR xdrs;
-  FILE *fd;
   Response serverRes;
-  bool_t success;
   
   myWarning(NULL, "serverResponse_Success");
   
@@ -143,17 +113,5 @@ bool serverResponse_Success(SOCKET sockfd, float *data, u_int dataLen) {
   serverRes.data.data_val = data;
   serverRes.data.data_len = dataLen;
   
-  fd = fdopen(dup(sockfd), "w");
-  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
-  setbuf(fd, NULL);
-    
-  success = xdr_Response(&xdrs, &serverRes);
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
-  
-  if (success == FALSE)
-    return false;
-  
-  return true;
+  return myTcpWriteXdr(sockfd, (myXdrFunction)&xdr_Response, (void*)&serverRes);
 }

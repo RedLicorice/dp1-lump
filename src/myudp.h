@@ -2,8 +2,8 @@
  * @brief Contiene i wrapper delle funzioni per i socket non connessi UDP.
  */
 
-#ifndef	__lunp_lg_udp_h
-#define	__lunp_lg_udp_h
+#ifndef	__myudp_h
+#define	__myudp_h
 
 /** @brief Crea un socket UDP.
  * @param serverAddress L'indirizzo del server.
@@ -15,7 +15,7 @@ SOCKET myUdpClientStartup(const char *serverAddress, const char *serverPort, str
 
 /** @brief Riceve fino a @p byteCount byte di dati.
  * @param sockfd Il file descriptor del socket da cui leggere i dati.
- * @retval buffer Il buffer in cui scrivere i dati ricevuti (dimensione @p byteCount). Se è uguale a NULL, il buffer viene allocato dinamicamente.
+ * @retval buffer Il buffer in cui scrivere i dati ricevuti (dimensione @p byteCount).
  * @param maxByteCount Il numero massimo di byte di dati da ricevere.
  * @retval sourceStruct La struttura contenente le informazioni sulla sorgente da cui i dati sono ricevuti. Se viene passato NULL, questo parametro viene ignorato.
  * @retval readByteCount Il numero di byte letti. Se viene passato NULL, questo parametro viene ignorato.
@@ -33,7 +33,7 @@ void myUdpWriteBytes(SOCKET sockfd, void *data, int byteCount, struct sockaddr_i
 
 /** @brief Riceve una stringa.
  * @param sockfd Il file descriptor del socket da cui leggere i dati.
- * @retval buffer Il buffer in cui scrivere la stringa ricevuta (dimensione @p charCount). Se è uguale a NULL, il buffer viene allocato dinamicamente.
+ * @retval buffer Il buffer in cui scrivere la stringa ricevuta (dimensione @p charCount).
  * @param maxCharCount Il numero massimo di caratteri della stringa da ricevere (incluso @c \\0).
  * @retval sourceStruct La struttura contenente le informazioni sulla sorgente da cui i dati sono ricevuti. Se viene passato NULL, questo parametro viene ignorato.
  * @retval readCharCount Il numero di caratteri letti (escluso @c \\0). Se viene passato NULL, questo parametro viene ignorato.

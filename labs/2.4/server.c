@@ -29,22 +29,10 @@ void childTask(SOCKET sockfd) {
 }
 
 bool clientRequest(SOCKET sockfd, int *num1, int *num2) {
-  XDR xdrs;
-  FILE *fd;
-  bool_t success;
+  if (myTcpReadXdr(sockfd, (myXdrFunction)&xdr_int, (void*)num1) == false)
+    return false;
   
-  fd = fdopen(dup(sockfd), "r");
-  xdrstdio_create(&xdrs, fd, XDR_DECODE);
-  
-  success = xdr_int(&xdrs, num1);
-  
-  if (success == TRUE)
-    success = xdr_int(&xdrs, num2);
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
-  
-  if (success == FALSE)
+  if (myTcpReadXdr(sockfd, (myXdrFunction)&xdr_int, (void*)num2) == false)
     return false;
 
   myWarning("Request received successfully", "clientRequest");
@@ -52,20 +40,7 @@ bool clientRequest(SOCKET sockfd, int *num1, int *num2) {
 }
 
 bool serverResponse(SOCKET sockfd, int result) {
-  XDR xdrs;
-  FILE *fd;
-  bool_t success;
-  
-  fd = fdopen(dup(sockfd), "w");
-  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
-  setbuf(fd, NULL);
-  
-  success = xdr_int(&xdrs, &result);
-
-  xdr_destroy(&xdrs);
-  fclose(fd);
-  
-  if (success == FALSE)
+  if (myTcpWriteXdr(sockfd, (myXdrFunction)&xdr_int, (void*)&result) == false)
     return false;
 
   myWarning("Response sent successfully", "serverResponse");

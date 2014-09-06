@@ -2,8 +2,8 @@
  * @brief Contiene i wrapper delle funzioni per i server con socket non connessi UDP.
  */
 
-#ifndef	__lunp_lg_udpserver_h
-#define	__lunp_lg_udpserver_h
+#ifndef	__myudpserver_h
+#define	__myudpserver_h
 
 /** @brief La funzione che viene chiamata dalle funzioni @c myUdpServerXxx ogni volta che un client si connette al server.
  * @param sockfd Il file descriptor del socket a cui il client da servire è conesso.
@@ -35,7 +35,7 @@ void myUdpServerPreforked(SOCKET sockfd, int childCount, myUdpServerChildTask ch
  * @param clientStruct La struttura contenente le informazioni sul client da cui i dati sono stati ricevuti.
  * @param maxDatagrams Il numero massimo di datagrammi che può essere ricevuto dal client @p clientStruct.
  * @param maxClients Il numero massimo di client da riconoscere.
- * @returns Restituisce false se sono stati ricevuti più di @p maxDatagrams datagrammi dal client @p clientStruct, altrimenti restituisce true.
+ * @return Restituisce false se sono stati ricevuti più di @p maxDatagrams datagrammi dal client @p clientStruct, altrimenti restituisce true.
  */
 bool myUdpLimitClients(struct sockaddr_in clientStruct, int maxDatagrams, int maxClients);
 

@@ -24,9 +24,6 @@ bool myUdpReadBytes(SOCKET sockfd, void *buffer, int maxByteCount, struct sockad
   ssize_t readByteCountTmp;
   socklen_t addrlen;
   
-  if (buffer == NULL)
-    buffer = (void*)malloc(sizeof(void) * maxByteCount);
-  
   if (sourceStruct == NULL)
     readByteCountTmp = recvfrom(sockfd, buffer, maxByteCount, 0, NULL, NULL);
   else { // sourceStruct != NULL
@@ -50,9 +47,6 @@ void myUdpWriteBytes(SOCKET sockfd, void *data, int byteCount, struct sockaddr_i
 bool myUdpReadString(SOCKET sockfd, char *buffer, int maxCharCount, struct sockaddr_in *sourceStruct, int *readCharCount) {
   int readCharCountTmp;
   bool reply;
-  
-  if (buffer == NULL)
-    buffer = (char*)malloc(sizeof(char) * maxCharCount);
   
   reply = myUdpReadBytes(sockfd, (void*)buffer, maxCharCount - 1, sourceStruct, &readCharCountTmp);
   

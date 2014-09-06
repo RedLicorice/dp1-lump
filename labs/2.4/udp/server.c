@@ -3,38 +3,39 @@
 #define SERVER_PORT_ARG argv[1] // server port
 
 void childTask(SOCKET sockfd);
-bool clientRequest(SOCKET sockfd, int *num1, int *num2);
-bool serverResponse(SOCKET sockfd, int result);
+bool clientRequest(SOCKET sockfd, int *num1, int *num2, struct sockaddr_in *saddr);
+bool serverResponse(SOCKET sockfd, int result, struct sockaddr_in saddr);
 
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
   
-  sockfd = myTcpServerStartup(SERVER_PORT_ARG);
+  sockfd = myUdpServerStartup(SERVER_PORT_ARG);
   
-  myTcpServerSimple(sockfd, &childTask);
+  myUdpServerSimple(sockfd, &childTask);
   
   return 0;
 }
 
 void childTask(SOCKET sockfd) {
   int num1, num2, result;
+  struct sockaddr_in saddr;
   
-  if (clientRequest(sockfd, &num1, &num2) == false)
+  if (clientRequest(sockfd, &num1, &num2, &saddr) == false)
     return;
 
   result = num1 + num2;
 
-  if (serverResponse(sockfd, result) == false)
+  if (serverResponse(sockfd, result, saddr) == false)
     return;
 }
 
-bool clientRequest(SOCKET sockfd, int *num1, int *num2) {
+bool clientRequest(SOCKET sockfd, int *num1, int *num2, struct sockaddr_in *saddr) {
   XDR *xdrs;
   char clientReq[BUFFSIZE];
   int bufferPos;
   bool success;
   
-  myTcpReadBytesOnce(sockfd, (void*)clientReq, BUFFSIZE, &bufferPos);
+  myUdpReadBytes(sockfd, (void*)clientReq, BUFFSIZE, saddr, &bufferPos);
   
   xdrs = myUdpReadXdrStartup(clientReq, bufferPos);
   
@@ -52,7 +53,7 @@ bool clientRequest(SOCKET sockfd, int *num1, int *num2) {
   return true;
 }
 
-bool serverResponse(SOCKET sockfd, int result) {
+bool serverResponse(SOCKET sockfd, int result, struct sockaddr_in saddr) {
   XDR *xdrs;
   char serverRes[BUFFSIZE];
   int bufferPos;
@@ -67,7 +68,7 @@ bool serverResponse(SOCKET sockfd, int result) {
   if (success == false)
     return false;
   
-  myTcpWriteBytes(sockfd, (void*)serverRes, bufferPos);
+  myUdpWriteBytes(sockfd, (void*)serverRes, bufferPos, saddr);
   
   myWarning("Response sent successfully", "serverResponse");
   return true;

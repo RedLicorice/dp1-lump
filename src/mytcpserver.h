@@ -2,8 +2,8 @@
  * @brief Contiene i wrapper delle funzioni per i server con socket connessi TCP.
  */
 
-#ifndef	__lunp_lg_tcpserver_h
-#define	__lunp_lg_tcpserver_h
+#ifndef	__mytcpserver_h
+#define	__mytcpserver_h
 
 /** @brief La funzione che viene chiamata dalle funzioni @c myTcpServerXxx ogni volta che un client si connette al server.
  * @param sockfd Il file descriptor del socket a cui il client da servire è conesso.

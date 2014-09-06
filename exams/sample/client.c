@@ -37,62 +37,37 @@ int main(int argc, char *argv[]) {
 }
 
 void clientRequest_Get(SOCKET sockfd, char *fileName) {
-  XDR xdrs;
-  FILE *fd;
   Request clientReq;
   
   clientReq.op = GET;
   clientReq.data = fileName;
   
-  fd = fdopen(dup(sockfd), "w");
-  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
-  setbuf(fd, NULL);
-  
-  if (xdr_Request(&xdrs, &clientReq) == FALSE)
+  if (myTcpWriteXdr(sockfd, (myXdrFunction)&xdr_Request, (void*)&clientReq) == false)
     myFunctionError("xdr_Request", NULL, "clientRequest_Get");
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
 }
 
 void clientRequest_Quit(SOCKET sockfd) {
-  XDR xdrs;
-  FILE *fd;
   Request clientReq;
   
   clientReq.op = QUIT;
   clientReq.data = (char*)malloc(0);
   
-  fd = fdopen(dup(sockfd), "w");
-  xdrstdio_create(&xdrs, fd, XDR_ENCODE);
-  setbuf(fd, NULL);
-  
-  if (xdr_Request(&xdrs, &clientReq) == FALSE)
+  if (myTcpWriteXdr(sockfd, (myXdrFunction)&xdr_Request, (void*)&clientReq) == false)
     myFunctionError("xdr_Request", NULL, "clientRequest_Quit");
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
   
   free(clientReq.data);
 }
 
 void serverResponse(SOCKET sockfd, char *fileName) {
-  XDR xdrs;
-  FILE *fd;
   Response serverRes;
+  FILE *fd;
   
   u_int fileSize;
     
   serverRes.data.data_val = NULL;
   
-  fd = fdopen(dup(sockfd), "r");
-  xdrstdio_create(&xdrs, fd, XDR_DECODE);
-  
-  if (xdr_Response(&xdrs, &serverRes) == FALSE)
+  if (myTcpReadXdr(sockfd, (myXdrFunction)&xdr_Response, (void*)&serverRes) == false)
     myFunctionError("xdr_Response", NULL, "serverResponse");
-  
-  xdr_destroy(&xdrs);
-  fclose(fd);
   
   if (serverRes.success == FALSE) {
     myWarning("Illegal command or non-existing file", "serverResponse");
