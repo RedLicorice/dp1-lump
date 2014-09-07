@@ -1,4 +1,5 @@
 cscope
 doxygen
+src/config.h
 test
 !test/client/client-empty.c

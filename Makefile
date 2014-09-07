@@ -1,8 +1,16 @@
 CC=gcc
 CFLAGS=-Wall -g -Wno-deprecated-declarations
 
-.PHONY: cscope doxygen # http://stackoverflow.com/questions/3931741/why-does-make-think-the-target-is-up-to-date
-	
+.PHONY: config cscope doxygen # http://stackoverflow.com/questions/3931741/why-does-make-think-the-target-is-up-to-date
+
+config:
+	cd config ; ./configure
+	mv config/config.h src/config.h
+	rm config/config.log
+	rm config/config.status
+	rm config/Make.defines
+	rm config/Makefile
+
 compile: copylunp
 	@echo "*******************Compiling client-empty...*******************"
 	@rm -rf /tmp/lunp
