@@ -47,7 +47,7 @@ void childTask(SOCKET sockfd) {
       myTcpWriteBytes(sockfd, (void*)(&fileSize), sizeof(uint32_t));
       
       myTcpReadFromFileAndWriteChunks(sockfd, nomeFile);
-      myWarning("File sent successfully to the client...", "childTask");
+      myWarning("File sent successfully to the client", "childTask");
     }
     
   }

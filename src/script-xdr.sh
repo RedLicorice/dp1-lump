@@ -74,12 +74,12 @@ case $1 in
     fi
     
     echo -e "\n*******************Compiling client2...*******************"
-    if gcc -Wall -Wno-deprecated-declarations -o socket_client client/*.c *.c -I client -lpthread -lm ; then
+    if gcc -Wall -Wno-deprecated-declarations -o socket_client2 client2/*.c *.c -I client -lpthread -lm ; then
       echo -e "\n*******************Compiling server2...*******************"
-      if gcc -Wall -Wno-deprecated-declarations -o socket_server server/*.c *.c -I server -lpthread -lm ; then
+      if gcc -Wall -Wno-deprecated-declarations -o socket_server2 server2/*.c *.c -I server -lpthread -lm ; then
 	echo -e "\n*******************Launching server2...*******************"
 	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
-	./socket_server "$@"
+	./socket_server2 "$@"
       fi
     fi
     ;;

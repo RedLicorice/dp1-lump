@@ -53,4 +53,21 @@ void myTcpServerOCPCMax(SOCKET sockfd, int maxChildCount, myTcpServerChildTask c
  */
 void myTcpServerPreforked(SOCKET sockfd, int childCount, myTcpServerChildTask childTask);
 
+/** @brief Implementa un server TCP che serve più client tramite il pre-fork di @p minChildCount processi figlio.
+ * @param sockfd Il file descriptor del socket a cui i client si connettono.
+ * @param minChildCount Il numero minimo di processi figlio generati con il pre-fork.
+ * @param childTask La funzione da chiamare ogni volta che un client si connette al socket @p sockfd.
+ * @warning Questa funzione non ritorna mai.
+ */
+void myTcpServerMixed(SOCKET sockfd, int minChildCount, myTcpServerChildTask childTask);
+
+/** @brief Implementa un server TCP che serve fino a @p maxChildCount client tramite il pre-fork di @p minChildCount processi figlio.
+ * @param sockfd Il file descriptor del socket a cui i client si connettono.
+ * @param minChildCount Il numero minimo di processi figlio generati con il pre-fork.
+ * @param maxChildCount Il numero massimo di client da servire allo stesso tempo.
+ * @param childTask La funzione da chiamare ogni volta che un client si connette al socket @p sockfd.
+ * @warning Questa funzione non ritorna mai.
+ */
+void myTcpServerMixedMax(SOCKET sockfd, int minChildCount, int maxChildCount, myTcpServerChildTask childTask);
+
 #endif

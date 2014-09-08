@@ -34,10 +34,10 @@ void childTask(SOCKET sockfd) {
   
   while(1) {
     
-    if (clientRequest(sockfd, &clientReq) == false)
-      return;
+    valid = clientRequest(sockfd, &clientReq);
       
-    valid = processClientRequest(clientReq, &data, &dataLen);
+    if (valid == true)
+      valid = processClientRequest(clientReq, &data, &dataLen);
     
     if (valid == true) {
       if (serverResponse_Success(sockfd, data, dataLen) == false) {

@@ -515,6 +515,6 @@ void	 err_ret(const char *, ...);
 void	 err_sys(const char *, ...);
 
 
-#include "myunp.h"
+#include "mylunp.h"
 
 #endif	/* __lunp_h */

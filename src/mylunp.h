@@ -1,5 +1,5 @@
-#ifndef	__myunp_h
-#define	__myunp_h
+#ifndef	__mylunp_h
+#define	__mylunp_h
 
 #undef HAVE_INET6_RTH_INIT // fix for Ubuntu 14.04
 
