@@ -72,6 +72,38 @@ int myWaitForMultipleObjects(int maxSeconds, int fileDescriptorCount, ...) { // 
   return -1; // just to shut down a compiler warning
 }
 
+int myWaitForMultipleObjectsArray(int maxSeconds, int fileDescriptorCount, int *fileDescriptorArray) {
+  fd_set cset;
+  struct timeval timeout;
+  int i, selectReply;
+  
+  FD_ZERO(&cset);
+  
+  for (i = 0; i < fileDescriptorCount; ++i)
+    FD_SET(fileDescriptorArray[i], &cset);
+  
+  if (maxSeconds > -1) {
+    timeout.tv_sec = maxSeconds;
+    timeout.tv_usec = 0;
+    selectReply = select(FD_SETSIZE, &cset, NULL, NULL, &timeout);
+  
+  } else // maxSeconds == -1 (infinite timeout)
+    selectReply = select(FD_SETSIZE, &cset, NULL, NULL, NULL);
+    
+  if (selectReply == -1)
+    mySystemError("select", "myWaitForMultipleObjectsArray");
+  
+  if (selectReply == 0)
+    return 0; // expired timeout
+    
+  for (i = 0; i < fileDescriptorCount; ++i)
+    if (FD_ISSET(fileDescriptorArray[i], &cset))
+      return (i + 1);
+  
+  myError("Can not determine which file descriptor has become ready", "myWaitForMultipleObjectsArray");
+  return -1; // just to shut down a compiler warning
+}
+
 bool fileExists(const char *filePath) {
   // http://stackoverflow.com/a/230068
   if (access(filePath, R_OK) == -1)

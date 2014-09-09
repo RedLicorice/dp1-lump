@@ -12,12 +12,12 @@ typedef enum bool bool;
 
 #define DEFAULT_CHUNK_SIZE 256
 
+#include "myerror.h"
 #include "myother.h"
 #include "mytcp.h"
 #include "mytcpserver.h"
 #include "myudp.h"
 #include "myudpserver.h"
-#include "myerror.h"
 #include "myxdr.h"
 
 #include "common.h"

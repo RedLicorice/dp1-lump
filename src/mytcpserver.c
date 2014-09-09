@@ -91,6 +91,47 @@ void myTcpServerMixedMax(SOCKET sockfd, int minChildCount, int maxChildCount, my
   tcpServerOCPCMax(sockfd, maxChildCount, childTask, true);
 }
 
+void myTcpServerSelect(SOCKET sockfd, int maxChildCount, myTcpServerSelectChildTask childTask) {
+  SOCKET *sockfdArray, sockfd_copy;
+  int sockfdCount, freeSockfd, i;
+  struct sockaddr_in clientAddr;
+  
+  sockfdArray = (SOCKET*)malloc(sizeof(SOCKET) * (maxChildCount + 1));
+  sockfdArray[0] = sockfd;
+  sockfdCount = 1;
+  
+  while (1) {
+    
+    printf("\n");
+    myWarning("Server on listening...", "myTcpServerSelect");
+    
+    freeSockfd = myWaitForMultipleObjectsArray(-1, sockfdCount, (int*)sockfdArray);
+    
+    if (freeSockfd == 1) { // sockfd
+      if (sockfdCount - 1 == maxChildCount)
+	myWarning("Cannot accept a new connection now: maximum child count reached", "myTcpServerSelect");
+      
+      else {
+	sockfd_copy = myTcpServerAccept(sockfd, &clientAddr);
+	myWarning("Connection accepted", "myTcpServerSelect");
+	
+	sockfdArray[sockfdCount] = sockfd_copy;
+	sockfdCount++;
+      }
+      
+    } else { // freeSockfd != sockfd
+      if (childTask(sockfdArray[freeSockfd - 1]) == false) {
+	Close(sockfdArray[freeSockfd - 1]);
+	
+	for (i = freeSockfd; i < sockfdCount; ++i)
+	  sockfdArray[i - 1] = sockfdArray[i];
+	sockfdCount--;
+      }
+    }
+    
+  }
+}
+
 static void tcpServerPreforked(SOCKET sockfd, int childCount, myTcpServerChildTask childTask) {
   int i;
   pid_t childpid;

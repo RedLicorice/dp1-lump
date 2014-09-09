@@ -10,6 +10,12 @@
  */
 typedef void (*myTcpServerChildTask)(SOCKET sockfd);
 
+/** @brief La funzione che viene chiamata dalla funzione @c myTcpServerSelect ogni volta che un client si connette al server.
+ * @param sockfd Il file descriptor del socket a cui il client da servire è conesso.
+ * @return Deve restituire false se si vuole chiudere la connessione, true se si vuole mantenere attiva la connessione.
+ */
+typedef bool (*myTcpServerSelectChildTask)(SOCKET sockfd);
+
 /** @brief Accetta una connessione sul socket TCP specificato.
  * @param sockfd Il file descriptor del socket TCP su cui accettare la connessione.
  * @retval clientStruct La struttura contenente le informazioni sul client.
@@ -69,5 +75,13 @@ void myTcpServerMixed(SOCKET sockfd, int minChildCount, myTcpServerChildTask chi
  * @warning Questa funzione non ritorna mai.
  */
 void myTcpServerMixedMax(SOCKET sockfd, int minChildCount, int maxChildCount, myTcpServerChildTask childTask);
+
+/** @brief Implementa un server TCP che serve fino a @p maxChildCount client nello stesso processo.
+ * @param sockfd Il file descriptor del socket a cui i client si connettono.
+ * @param maxChildCount Il numero massimo di client da servire allo stesso tempo.
+ * @param childTask La funzione da chiamare ogni volta che un client si connette al socket @p sockfd.
+ * @warning Questa funzione non ritorna mai.
+ */
+void myTcpServerSelect(SOCKET sockfd, int maxChildCount, myTcpServerSelectChildTask childTask);
 
 #endif

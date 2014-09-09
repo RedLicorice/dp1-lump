@@ -39,7 +39,8 @@ compile-server: copylunp
 	
 copylunp: clean
 	@cp src/*.c test
-	@find src/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec cp \{} test/ \;
+	#@find src/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec cp \{} test/ \;
+	@cp src/*.h test
 	@cp -n src/common.h test/common.h
 
 clean:

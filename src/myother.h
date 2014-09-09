@@ -20,6 +20,14 @@ bool myWaitForSingleObject(int maxSeconds, int fileDescriptor);
  */
 int myWaitForMultipleObjects(int maxSeconds, int fileDescriptorCount, ...);
 
+/** @brief Attende finché uno dei @p fileDescriptorCount descrittori di file specificati non diventa pronto oppure l'intervallo di timeout non scade.
+ * @param maxSeconds Il numero massimo di secondi per cui attendere che uno dei descrittori diventi pronto. Se viene passato -1, l'intervallo di timeout è infinito e la funzione non ritorna finché uno dei descrittori di file non diventa pronto.
+ * @param fileDescriptorCount Il numero di descrittori di file specificati.
+ * @param fileDescriptorArray I descrittori di file da attendere che diventino pronti.
+ * @return Restituisce 0 (false) se il timeout è scaduto prima che uno dei descrittori diventasse pronto. Restituisce 1 se il primo descrittore è diventato pronto prima che il timeout scadesse, e così via.
+ */
+int myWaitForMultipleObjectsArray(int maxSeconds, int fileDescriptorCount, int *fileDescriptorArray);
+
 /** @brief Verifica l'esistenza di un file.
  * @param filePath Il percorso del file di cui verificare l'esistenza.
  * @return Restituisce true se il file esiste, altrimenti restituisce false.
