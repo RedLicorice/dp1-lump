@@ -30,9 +30,9 @@ case $1 in
     fi
       
     echo -e "\n*******************Compiling client...*******************"
-    if gcc -Wall -Wno-deprecated-declarations -o socket_client client/*.c *.c -I client -lpthread -lm ; then
+    if gcc -Wall -Wno-deprecated-declarations -o socket_client client/*.c *.c -I client -lpthread -lm -lrt ; then
       echo -e "\n*******************Compiling server...*******************"
-      if gcc -Wall -Wno-deprecated-declarations -o socket_server server/*.c *.c -I server -lpthread -lm ; then
+      if gcc -Wall -Wno-deprecated-declarations -o socket_server server/*.c *.c -I server -lpthread -lm -lrt ; then
 	echo -e "\n*******************Launching server...*******************"
 	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
 	./socket_server "$@"
@@ -52,9 +52,9 @@ case $1 in
     fi
     
     echo -e "\n*******************Compiling client1...*******************"
-    if gcc -Wall -Wno-deprecated-declarations -o socket_client1 client1/*.c *.c -I client1 -lpthread -lm ; then
+    if gcc -Wall -Wno-deprecated-declarations -o socket_client1 client1/*.c *.c -I client1 -lpthread -lm -lrt ; then
       echo -e "\n*******************Compiling server1...*******************"
-      if gcc -Wall -Wno-deprecated-declarations -o socket_server1 server1/*.c *.c -I server1 -lpthread -lm ; then
+      if gcc -Wall -Wno-deprecated-declarations -o socket_server1 server1/*.c *.c -I server1 -lpthread -lm -lrt ; then
 	echo -e "\n*******************Launching server1...*******************"
 	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
 	./socket_server1 "$@"
@@ -74,9 +74,9 @@ case $1 in
     fi
     
     echo -e "\n*******************Compiling client2...*******************"
-    if gcc -Wall -Wno-deprecated-declarations -o socket_client2 client2/*.c *.c -I client -lpthread -lm ; then
+    if gcc -Wall -Wno-deprecated-declarations -o socket_client2 client2/*.c *.c -I client -lpthread -lm -lrt ; then
       echo -e "\n*******************Compiling server2...*******************"
-      if gcc -Wall -Wno-deprecated-declarations -o socket_server2 server2/*.c *.c -I server -lpthread -lm ; then
+      if gcc -Wall -Wno-deprecated-declarations -o socket_server2 server2/*.c *.c -I server -lpthread -lm -lrt ; then
 	echo -e "\n*******************Launching server2...*******************"
 	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
 	./socket_server2 "$@"

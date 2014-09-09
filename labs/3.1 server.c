@@ -46,7 +46,11 @@ void childTask(SOCKET sockfd) {
       fileSize = htonl(getFileSize(nomeFile));
       myTcpWriteBytes(sockfd, (void*)(&fileSize), sizeof(uint32_t));
       
-      myTcpReadFromFileAndWriteChunks(sockfd, nomeFile);
+      if (myTcpReadFromFileAndWriteChunks(sockfd, nomeFile, NULL) == false) {
+	myWarning("The client closed the connection abruptly", "childTask");
+	return;
+      }
+      
       myWarning("File sent successfully to the client", "childTask");
     }
     

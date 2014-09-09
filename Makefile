@@ -15,7 +15,7 @@ compile: copylunp
 	@echo "*******************Compiling client-empty...*******************"
 	@rm -rf /tmp/lunp
 	@mkdir -p /tmp/lunp
-	@$(CC) $(CFLAGS) -o /tmp/lunp/compilation test/client/client-empty.c test/*.c -I client -lpthread -lm
+	@$(CC) $(CFLAGS) -o /tmp/lunp/compilation test/client/client-empty.c test/*.c -I client -lpthread -lm -lrt
 	@rm -rf /tmp/lunp
 	
 client: compile-client
@@ -31,11 +31,11 @@ server: compile-server
 	
 compile-client: copylunp
 	@echo "*******************Compiling client...*******************"
-	@$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -I client -lpthread -lm
+	@$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -I client -lpthread -lm -lrt
 	
 compile-server: copylunp
 	@echo "*******************Compiling server...*******************"
-	@$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -I server -lpthread -lm
+	@$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -I server -lpthread -lm -lrt
 	
 copylunp: clean
 	@cp src/*.c test

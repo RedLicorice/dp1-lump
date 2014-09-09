@@ -5,6 +5,8 @@ static bool myTcpReadFromFileAndWriteChunksCallback(void *chunk, int *chunkSize,
 
 static ssize_t readnOnce(int fd, void *vptr, size_t n);
 static ssize_t ReadnOnce(int fd, void *ptr, size_t nbytes);
+static ssize_t writenPipe(int fd, const void *vptr, size_t n, bool *pipe);
+static bool WritenPipe(int fd, void *ptr, size_t nbytes);
 
 SOCKET myTcpClientStartup(const char *serverAddress, const char *serverPort) {
   return Tcp_connect(serverAddress, serverPort);
@@ -24,8 +26,8 @@ bool myTcpReadBytes(SOCKET sockfd, void *buffer, int byteCount, int *readByteCou
     return true;
 }
 
-void myTcpWriteBytes(SOCKET sockfd, void *data, int byteCount) {
-  Writen(sockfd, data, (size_t)byteCount);
+bool myTcpWriteBytes(SOCKET sockfd, void *data, int byteCount) {
+  return WritenPipe(sockfd, data, (size_t)byteCount);
 }
 
 bool myTcpReadString(SOCKET sockfd, char *buffer, int charCount, int *readCharCount) {
@@ -42,8 +44,8 @@ bool myTcpReadString(SOCKET sockfd, char *buffer, int charCount, int *readCharCo
   return reply;
 }
 
-void myTcpWriteString(SOCKET sockfd, char *string) {
-  myTcpWriteBytes(sockfd, (void*)string, strlen(string));
+bool myTcpWriteString(SOCKET sockfd, char *string) {
+  return myTcpWriteBytes(sockfd, (void*)string, strlen(string));
 }
 
 bool myTcpReadLine(SOCKET sockfd, char *buffer, int maxLength, int *readCharCount) {
@@ -143,35 +145,48 @@ static bool myTcpReadChunksAndWriteToFileCallback(void *chunk, int chunkSize, vo
   return true;
 }
 
-int myTcpWriteChunks(SOCKET sockfd, myTcpWriteChunksCallback callback, void *callbackParam) {
+bool myTcpWriteChunks(SOCKET sockfd, myTcpWriteChunksCallback callback, void *callbackParam, int *writtenByteCount) {
   int numberOfWrittenBytes, chunkSize;
   void *buffer;
+  bool reply;
   
+  reply = true;
   buffer = (void*)malloc(sizeof(void) * DEFAULT_CHUNK_SIZE);
   
   while (callback(buffer, &chunkSize, callbackParam) == true) {
-    myTcpWriteBytes(sockfd, buffer, chunkSize);
+    if (myTcpWriteBytes(sockfd, buffer, chunkSize) == false) {
+      reply = false;
+      break; // exit while loop
+    }
     numberOfWrittenBytes += chunkSize;
   }
   
   free(buffer);
-  return numberOfWrittenBytes;
+  
+  if (writtenByteCount != NULL)
+    *writtenByteCount = numberOfWrittenBytes;
+  
+  return reply;
 }
 
-int myTcpReadFromFileAndWriteChunks(SOCKET sockfd, const char *filePath) {
+bool myTcpReadFromFileAndWriteChunks(SOCKET sockfd, const char *filePath, int *writtenByteCount) {
   FILE *fd;
   int numberOfWrittenBytes;
+  bool reply;
   
   fd = fopen(filePath, "r");
   if (fd == NULL)
     mySystemError("fopen", "myTcpReadFromFileAndWriteChunks");
   
-  numberOfWrittenBytes = myTcpWriteChunks(sockfd, myTcpReadFromFileAndWriteChunksCallback, (void*)fd);
+  reply = myTcpWriteChunks(sockfd, myTcpReadFromFileAndWriteChunksCallback, (void*)fd, &numberOfWrittenBytes);
   
   if (fclose(fd) == EOF)
     mySystemError("fclose", "myTcpReadFromFileAndWriteChunks");
   
-  return numberOfWrittenBytes;
+  if (writtenByteCount != NULL)
+    *writtenByteCount = numberOfWrittenBytes;
+  
+  return reply;
 }
 
 static bool myTcpReadFromFileAndWriteChunksCallback(void *chunk, int *chunkSize, void *param) {
@@ -348,4 +363,40 @@ static ssize_t ReadnOnce(int fd, void *ptr, size_t nbytes) {
 	if ( (n = readnOnce(fd, ptr, nbytes)) == -1)
 		err_sys("readnOnce error");
 	return(n);
+}
+
+static ssize_t writenPipe(int fd, const void *vptr, size_t n, bool *pipe) {
+	size_t		nleft;
+	ssize_t		nwritten;
+	const char	*ptr;
+
+	ptr = vptr;
+	nleft = n;
+	while (nleft > 0) {
+		if ( (nwritten = write(fd, ptr, nleft)) <= 0) {
+		  
+			if (errno == 104) // Connection reset by peer
+			  *pipe = false;
+		  
+			if (nwritten < 0 && errno == EINTR)
+				nwritten = 0;		/* and call write() again */
+			else
+				return(-1);			/* error */
+		}
+
+		nleft -= nwritten;
+		ptr   += nwritten;
+	}
+	return(n);
+}
+
+static bool WritenPipe(int fd, void *ptr, size_t nbytes) {
+  bool pipe;
+  pipe = true;
+	if (writenPipe(fd, ptr, nbytes, &pipe) != nbytes) {
+	  if (pipe == false)
+	    return false;
+		err_sys("writen error");
+	}
+	return true;
 }
