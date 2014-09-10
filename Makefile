@@ -15,7 +15,7 @@ compile: copylunp
 	@echo "*******************Compiling client-empty...*******************"
 	@rm -rf /tmp/lunp
 	@mkdir -p /tmp/lunp
-	@$(CC) $(CFLAGS) -o /tmp/lunp/compilation test/client/client-empty.c test/*.c -I client -lpthread -lm -lrt
+	@$(CC) $(CFLAGS) -o /tmp/lunp/compilation test/client/client-empty.c test/*.c -Iclient -lpthread -lm
 	@rm -rf /tmp/lunp
 	
 client: compile-client
@@ -31,16 +31,15 @@ server: compile-server
 	
 compile-client: copylunp
 	@echo "*******************Compiling client...*******************"
-	@$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -I client -lpthread -lm -lrt
+	@$(CC) $(CFLAGS) -o test/socket_client test/client/client.c test/*.c -Iclient -lpthread -lm
 	
 compile-server: copylunp
 	@echo "*******************Compiling server...*******************"
-	@$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -I server -lpthread -lm -lrt
+	@$(CC) $(CFLAGS) -o test/socket_server test/server/server.c test/*.c -Iserver -lpthread -lm
 	
 copylunp: clean
 	@cp src/*.c test
-	#@find src/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec cp \{} test/ \;
-	@cp src/*.h test
+	@find src/ -mindepth 1 -maxdepth 1 -name *.h -and ! -name common.h -exec cp \{} test/ \;
 	@cp -n src/common.h test/common.h
 
 clean:

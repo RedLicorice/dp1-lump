@@ -102,7 +102,7 @@ typedef bool (*myTcpWriteChunksCallback)(void *chunk, int *chunkSize, void *para
  * @param sockfd Il file descriptor del socket su cui scrivere i dati.
  * @param callback La funzione di callback da chiamare ogni volta che deve essere inviato un chunk di dati.
  * @param callbackParam L'eventuale parametro passato alla funzione di callback @p callback.
- * @retval writtenByteCount Restituisce il numero di byte scritti. Se viene passato NULL, questo parametro viene ignorato.
+ * @retval writtenByteCount Il numero di byte scritti. Se viene passato NULL, questo parametro viene ignorato.
  * @return Restituisce false se l'endpoint remoto ha chiuso la connessione, altrimenti restituisce true.
  */
 bool myTcpWriteChunks(SOCKET sockfd, myTcpWriteChunksCallback callback, void *callbackParam, int *writtenByteCount);
@@ -110,7 +110,7 @@ bool myTcpWriteChunks(SOCKET sockfd, myTcpWriteChunksCallback callback, void *ca
 /** @brief Legge i dati da un file e li invia un chunk per volta.
  * @param sockfd Il file descriptor del socket su cui scrivere i dati.
  * @param filePath Il percorso del file da cui leggere i dati da scrivere.
- * @retval writtenByteCount Restituisce il numero di byte scritti. Se viene passato NULL, questo parametro viene ignorato.
+ * @retval writtenByteCount Il numero di byte scritti. Se viene passato NULL, questo parametro viene ignorato.
  * @return Restituisce false se l'endpoint remoto ha chiuso la connessione, altrimenti restituisce true.
  */
 bool myTcpReadFromFileAndWriteChunks(SOCKET sockfd, const char *filePath, int *writtenByteCount);
