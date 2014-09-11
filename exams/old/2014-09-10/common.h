@@ -8,6 +8,7 @@
 #define MAXFILENAMELENGTH MAXLINE
 
 #define PUT "PUT"
+#define QUIT "QUIT\r\n"
 #define OK "+OK\r\n"
 #define ERR "-ERR\r\n"
 

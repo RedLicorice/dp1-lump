@@ -20,45 +20,53 @@ int main(int argc, char *argv[]) {
 
 void childTask(SOCKET sockfd) {
   char clientReq[BUFFSIZE], fileName[MAXFILENAMELENGTH];
+  //uint32_t fileSize;
   bool valid;
+  
+//  while (1) {
     
-  valid = true;
+    valid = true;
     
-  if (myTcpReadLine(sockfd, clientReq, BUFFSIZE, NULL) == false)
-    valid = false;
-      
-  if (valid == true) {
-      
-    if (strlen(clientReq) < strlen(PUT) + strlen("\r\n"))
+    if (myTcpReadLine(sockfd, clientReq, BUFFSIZE, NULL) == false)
       valid = false;
-                
-    else {
-                
-      if (strncmp(clientReq, PUT, strlen(PUT)) != 0)
-        valid = false;
-                
-      else {
-        valid = true;
-        strcpy(fileName, clientReq + strlen(PUT));
-        fileName[strlen(fileName) - strlen("\r\n")] = '\0';
-      }
-    }
-  }
-    
-  if (valid == false) {
-    myWarning("Wrong format", "childTask");
-    myTcpWriteString(sockfd, ERR);
       
-  } else { // The file exists
-    myWarning("Receiving the file from the client...", "childTask");
-    myTcpWriteString(sockfd, OK);
+      
+    if (valid == true) {
+      
+            if (strlen(clientReq) < strlen(PUT) + strlen("\r\n"))
+                valid = false;
+                
+            else {
+                
+              if (strncmp(clientReq, PUT, strlen(PUT)) != 0)
+                valid = false;
+                
+              else {
+                valid = true;
+                strcpy(fileName, clientReq + strlen(PUT));
+                fileName[strlen(fileName) - strlen("\r\n")] = '\0';
+              }
+            }
+    }
+    
+    if (valid == false) {
+      myWarning("Wrong format", "childTask");
+      myTcpWriteString(sockfd, ERR);
+      
+    } else { // The file exists
+      myWarning("Receiving the file from the client...", "childTask");
+      myTcpWriteString(sockfd, OK);
 	
-    if (myTcpReadChunksAndWriteToFile2(sockfd, fileName, NULL) == false)
-      myError("Cannot write the file", "clientTask");
+  if (myTcpReadChunksAndWriteToFile2(sockfd, fileName, NULL) == false)
+    myError("Cannot write the file", "clientTask");
 	
-    myWarning("File received successfully from the client", "childTask");
-  }
+      myWarning("File received successfully from the client", "childTask");
+    }
+    
+//  }
 }
+
+
 
 bool myTcpReadChunks2(SOCKET sockfd, int *readByteCount, myTcpReadChunksCallback callback, void *callbackParam) {
   int numberOfReadBytes, chunkSize;
@@ -73,7 +81,7 @@ bool myTcpReadChunks2(SOCKET sockfd, int *readByteCount, myTcpReadChunksCallback
   
   while (1) {
 
-    chunkSize = DEFAULT_CHUNK_SIZE;
+      chunkSize = DEFAULT_CHUNK_SIZE;
     
     readReply = myTcpReadBytes(sockfd, buffer, chunkSize, &numberOfReadBytes);
     

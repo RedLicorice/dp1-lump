@@ -255,20 +255,20 @@ static void tcpServerOCPCMax(SOCKET sockfd, int maxChildCount, myTcpServerChildT
 static void waitForZombieChildren() {
   pid_t childpid;
   
+  childpid = waitpid(-1, NULL, WNOHANG);
+  while (childpid > 0) {
+    myWarning("Child %d was zombie  [%d children]", "waitForZombieChildren", childpid, numChildren_ocpc);
     childpid = waitpid(-1, NULL, WNOHANG);
-    while (childpid > 0) {
-      myWarning("Child %d was zombie  [%d children]", "waitForZombieChildren", childpid, numChildren_ocpc);
-      childpid = waitpid(-1, NULL, WNOHANG);
-    }
+  }
     
-    if (childpid == -1) {
-      if (errno == 10) // No child processes
-	myWarning("Now there are no children  [%d children]", "waitForZombieChildren", numChildren_ocpc);
-      else
-	mySystemError("waitpid", "waitForZombieChildren");
+  if (childpid == -1) {
+    if (errno == 10) // No child processes
+      myWarning("Now there are no children  [%d children]", "waitForZombieChildren", numChildren_ocpc);
+    else
+      mySystemError("waitpid", "waitForZombieChildren");
       
-    } else // childpid = 0
-      myWarning("Now there are no zombie children  [%d children]", "waitForZombieChildren", numChildren_ocpc);
+  } else // childpid = 0
+    myWarning("Now there are no zombie children  [%d children]", "waitForZombieChildren", numChildren_ocpc);
 }
 
 static void sigchldHandler(int s) {

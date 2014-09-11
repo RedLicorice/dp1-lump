@@ -16,6 +16,7 @@ static void tcpServerOCPC2(SOCKET sockfd, myTcpServerChildTask2 childTask, bool 
 static void sigchldHandler2(int s);
 static void waitForZombieChildren2();
 
+
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
   
@@ -28,15 +29,22 @@ int main(int argc, char *argv[]) {
 
 void childTask(SOCKET sockfd, struct sockaddr_in clientAddr) {
   char clientReq[BUFFSIZE], fileName[MAXFILENAMELENGTH], solofile[MAXFILENAMELENGTH];
+  //uint32_t fileSize;
   bool valid;
   
   uint16_t porta;
+  uint32_t indirizzo;
   char *indirizzoString, portaString[BUFFSIZE];
   
-  porta = htons(clientAddr.sin_port);
+  porta = clientAddr.sin_port;
+  indirizzo = clientAddr.sin_addr.s_addr;
+  
+  printf("DEBUG2 porta = %u\nindirizzo = %u\n", porta, indirizzo);
   
   indirizzoString = inet_ntoa(clientAddr.sin_addr);
   printf("%s\n", indirizzoString);
+  
+  
   
   fileName[0] = '\0';
   strcat(fileName, indirizzoString);
@@ -44,49 +52,58 @@ void childTask(SOCKET sockfd, struct sockaddr_in clientAddr) {
   sprintf(portaString, "%u", porta);
   strcat(fileName, portaString);
   
-  if (mkdir(fileName, 0777) == -1)
-    mySystemError("mkdir", NULL);
+  printf("La cartella è: %s\n", fileName);
+  if (mkdir (fileName, 0777) == -1)
+        mySystemError("mkdir", NULL);
+  
+  
+//  while (1) {
     
-  valid = true;
+    valid = true;
     
-  if (myTcpReadLine(sockfd, clientReq, BUFFSIZE, NULL) == false)
-    valid = false;
-
-  if (valid == true) {
-      
-    if (strlen(clientReq) < strlen(PUT) + strlen("\r\n"))
+    if (myTcpReadLine(sockfd, clientReq, BUFFSIZE, NULL) == false)
       valid = false;
-                
-    else {
-                
-      if (strncmp(clientReq, PUT, strlen(PUT)) != 0)
-        valid = false;
-                
-      else {
-        valid = true;
-        strcpy(solofile, clientReq + strlen(PUT));
-        solofile[strlen(solofile) - strlen("\r\n")] = '\0';
-                
-        strcat(fileName, "/");
-        strcat(fileName, solofile);
-      }
-    }
-  }
-    
-  if (valid == false) {
-    myWarning("Wrong format", "childTask");
-    myTcpWriteString(sockfd, ERR);
       
-  } else { // The file exists
-    myWarning("Receiving the file from the client...", "childTask");
-    myTcpWriteString(sockfd, OK);
+      
+    if (valid == true) {
+      
+            if (strlen(clientReq) < strlen(PUT) + strlen("\r\n"))
+                valid = false;
+                
+            else {
+                
+              if (strncmp(clientReq, PUT, strlen(PUT)) != 0)
+                valid = false;
+                
+              else {
+                valid = true;
+                strcpy(solofile, clientReq + strlen(PUT));
+                solofile[strlen(solofile) - strlen("\r\n")] = '\0';
+                
+                strcat(fileName, "/");
+                strcat(fileName, solofile);
+              }
+            }
+    }
+    
+    if (valid == false) {
+      myWarning("Wrong format", "childTask");
+      myTcpWriteString(sockfd, ERR);
+      
+    } else { // The file exists
+      myWarning("Receiving the file from the client...", "childTask");
+      myTcpWriteString(sockfd, OK);
 	
-    if (myTcpReadChunksAndWriteToFile2(sockfd, fileName, NULL) == false)
-      myError("Cannot write the file", "clientTask");
+  if (myTcpReadChunksAndWriteToFile2(sockfd, fileName, NULL) == false)
+    myError("Cannot write the file", "clientTask");
 	
-    myWarning("File received successfully from the client", "childTask");
-  }
+      myWarning("File received successfully from the client", "childTask");
+    }
+    
+//  }
 }
+
+
 
 bool myTcpReadChunks2(SOCKET sockfd, int *readByteCount, myTcpReadChunksCallback callback, void *callbackParam) {
   int numberOfReadBytes, chunkSize;
@@ -101,7 +118,7 @@ bool myTcpReadChunks2(SOCKET sockfd, int *readByteCount, myTcpReadChunksCallback
   
   while (1) {
 
-    chunkSize = DEFAULT_CHUNK_SIZE;
+      chunkSize = DEFAULT_CHUNK_SIZE;
     
     readReply = myTcpReadBytes(sockfd, buffer, chunkSize, &numberOfReadBytes);
     
@@ -143,6 +160,11 @@ static bool myTcpReadChunksAndWriteToFileCallback2(void *chunk, int chunkSize, v
     return myFunctionWarning("fwrite", "myTcpReadChunksAndWriteToFileCallback", NULL);
   return true;
 }
+
+
+
+
+
 
 void myTcpServerOCPC2(SOCKET sockfd, myTcpServerChildTask2 childTask) {
   tcpServerOCPC2(sockfd, childTask, false);
@@ -196,21 +218,22 @@ static void sigchldHandler2(int s) {
   }
 }
 
+
 static void waitForZombieChildren2() {
   pid_t childpid;
   
-  childpid = waitpid(-1, NULL, WNOHANG);
-  while (childpid > 0) {
-    myWarning("Child %d was zombie  [%d children]", "waitForZombieChildren2", childpid, numChildren_ocpc2);
     childpid = waitpid(-1, NULL, WNOHANG);
-  }
+    while (childpid > 0) {
+      myWarning("Child %d was zombie  [%d children]", "waitForZombieChildren2", childpid, numChildren_ocpc2);
+      childpid = waitpid(-1, NULL, WNOHANG);
+    }
     
-  if (childpid == -1) {
-    if (errno == 10) // No child processes
-      myWarning("Now there are no children  [%d children]", "waitForZombieChildren2", numChildren_ocpc2);
-    else
-      mySystemError("waitpid", "waitForZombieChildren2");
+    if (childpid == -1) {
+      if (errno == 10) // No child processes
+	myWarning("Now there are no children  [%d children]", "waitForZombieChildren2", numChildren_ocpc2);
+      else
+	mySystemError("waitpid", "waitForZombieChildren2");
       
-  } else // childpid = 0
-    myWarning("Now there are no zombie children  [%d children]", "waitForZombieChildren2", numChildren_ocpc2);
+    } else // childpid = 0
+      myWarning("Now there are no zombie children  [%d children]", "waitForZombieChildren2", numChildren_ocpc2);
 }

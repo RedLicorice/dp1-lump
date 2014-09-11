@@ -8,11 +8,10 @@ void clientTask(SOCKET sockfd, char *fileName);
 
 int main(int argc, char *argv[]) {
   SOCKET sockfd;
-  char fileName[MAXFILENAMELENGTH];
   
   sockfd = myTcpClientStartup(SERVER_ADDRESS_ARG, SERVER_PORT_ARG);
     
-    clientTask(sockfd, FILE_NAME_ARG);
+  clientTask(sockfd, FILE_NAME_ARG);
   
   Close(sockfd);
   return 0;
@@ -20,12 +19,11 @@ int main(int argc, char *argv[]) {
 
 void clientTask(SOCKET sockfd, char *fileName) {
   char serverRes[BUFFSIZE];
-  //uint32_t fileSize;
   
-    if (fileExists(fileName) == false) {
-      myWarning("The file does not exist", "clientTask");
-      return;
-    }
+  if (fileExists(fileName) == false) {
+    myWarning("The file does not exist", "clientTask");
+    return;
+  }
   
   myTcpWriteString(sockfd, PUT);
   myTcpWriteString(sockfd, fileName);
@@ -35,27 +33,16 @@ void clientTask(SOCKET sockfd, char *fileName) {
   
   if (strcmp(serverRes, ERR) == 0) {
     myWarning("Il server ha risposto ERR", "clientTask");
-    return; // next file
+    return;
   }
     
   // else: serverRes = OK
   myWarning("Sending the file to the server...", "clientTask");
-
-      //fileSize = htonl(getFileSize(fileName));
-      //myTcpWriteBytes(sockfd, (void*)(&fileSize), sizeof(uint32_t));
       
-      if (myTcpReadFromFileAndWriteChunks(sockfd, fileName, NULL) == false) {
-	myWarning("The server closed the connection abruptly", "clientTask");
-	return;
-      }
+  if (myTcpReadFromFileAndWriteChunks(sockfd, fileName, NULL) == false) {
+    myWarning("The server closed the connection abruptly", "clientTask");
+    return;
+  }
 	
-      myWarning("File sent successfully to the server", "clientTask");
-
-    
-  // else: serverRes = OK
-//  myTcpReadBytes(sockfd, (void*)(&fileSize), sizeof(uint32_t), NULL);
-//  fileSize = ntohl(fileSize);
-  
-//  if (myTcpReadChunksAndWriteToFile(sockfd, fileName, fileSize, NULL) == false)
-//    myError("Cannot write the file", "clientTask");
+  myWarning("File sent successfully to the server", "clientTask");
 }
