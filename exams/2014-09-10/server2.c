@@ -33,7 +33,7 @@ void childTask(SOCKET sockfd, struct sockaddr_in clientAddr) {
   uint16_t porta;
   char *indirizzoString, portaString[BUFFSIZE];
   
-  porta = htons(clientAddr.sin_port);
+  porta = ntohs(clientAddr.sin_port);
   
   indirizzoString = inet_ntoa(clientAddr.sin_addr);
   printf("%s\n", indirizzoString);
