@@ -52,12 +52,12 @@ You only need folder `src`.
         mv script-xdr.sh script.sh
 
 3. Inside the script, set the `twoClients` variable to:
-    * `false` if just a client, in folder `client`, is required;
+    * `false` if just one client, in folder `client`, is required;
     * `true` if two clients, in folders `client1` and `client2`, are required.
 
 
 4. Inside the script, set the `twoServers` variable to:
-    * `false` if just a server, in folder `server`, is required;
+    * `false` if just one server, in folder `server`, is required;
     * `true` if two servers, in folders `server1` and `server2`, are required.
 
 5. Compile the client and the server, and launch the server:
