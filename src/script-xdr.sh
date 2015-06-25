@@ -1,13 +1,17 @@
 #!/bin/bash
 
+twoClients= # set to true or false
+twoServers= # set to true or false
+
 # root = exam_dp_monthyyyy/source/
 zipDir="../" # exam_dp_monthyyyy/
 typesDir="../tools/" # exam_dp_monthyyyy/tools/
+srcZipPath=${PWD##*/}"/" # exam_dp_monthyyyy/source/ ( http://stackoverflow.com/a/1371283/1267803 )
 
 clear
 
 
-echo -e "\n*******************Generating rcpgen files...*******************"
+echo -e "*******************Generating rcpgen files...*******************"
 if [ ! -f $typesDir"types.h" ] ; then
   rpcgen -h $typesDir"types.x" -o $typesDir"types.h"
 fi
@@ -19,7 +23,7 @@ fi
 
 case $1 in
 
-  "compile") # http://stackoverflow.com/a/1024532
+  "compile")
   
     if [ ! -f "types.h" ] ; then
       cp $typesDir"types.h" "types.h"
@@ -29,19 +33,31 @@ case $1 in
       cp $typesDir"types.c" "types.c"
     fi
       
-    echo -e "\n*******************Compiling client...*******************"
-    if gcc -Wall -Wno-deprecated-declarations -o socket_client client/*.c *.c -Iclient -lpthread -lm ; then
-      echo -e "\n*******************Compiling server...*******************"
-      if gcc -Wall -Wno-deprecated-declarations -o socket_server server/*.c *.c -Iserver -lpthread -lm ; then
-	echo -e "\n*******************Launching server...*******************"
+    if [ "$twoClients" = true ] ; then
+      clientName="client1"
+    else
+      clientName="client"
+    fi
+    
+    if [ "$twoServers" = true ] ; then
+      serverName="server1"
+    else
+      serverName="server"
+    fi
+      
+    echo -e "\n\n*******************Compiling $clientName...*******************"
+    if gcc -Wall -Wno-deprecated-declarations -o socket_$clientName $clientName/*.c *.c -I$clientName -lpthread -lm ; then # http://stackoverflow.com/a/1024532
+      echo -e "\n\n*******************Compiling $serverName...*******************"
+      if gcc -Wall -Wno-deprecated-declarations -o socket_$serverName $serverName/*.c *.c -I$serverName -lpthread -lm ; then
+	echo -e "\n\n*******************Launching $serverName...*******************"
 	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
-	./socket_server "$@"
+	./socket_$serverName "$@"
       fi
     fi
     ;;
 
     
-  "compile1") # http://stackoverflow.com/a/1024532
+  "compile2")
   
     if [ ! -f "types.h" ] ; then
       cp $typesDir"types.h" "types.h"
@@ -50,36 +66,26 @@ case $1 in
     if [ ! -f "types.c" ] ; then
       cp $typesDir"types.c" "types.c"
     fi
-    
-    echo -e "\n*******************Compiling client1...*******************"
-    if gcc -Wall -Wno-deprecated-declarations -o socket_client1 client1/*.c *.c -Iclient1 -lpthread -lm ; then
-      echo -e "\n*******************Compiling server1...*******************"
-      if gcc -Wall -Wno-deprecated-declarations -o socket_server1 server1/*.c *.c -Iserver1 -lpthread -lm ; then
-	echo -e "\n*******************Launching server1...*******************"
-	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
-	./socket_server1 "$@"
-      fi
-    fi
-    ;;
-
-    
-  "compile2") # http://stackoverflow.com/a/1024532
   
-    if [ ! -f "types.h" ] ; then
-      cp $typesDir"types.h" "types.h"
-    fi
-	
-    if [ ! -f "types.c" ] ; then
-      cp $typesDir"types.c" "types.c"
+    if [ "$twoClients" = true ] ; then
+      clientName="client2"
+    else
+      clientName="client"
     fi
     
-    echo -e "\n*******************Compiling client2...*******************"
-    if gcc -Wall -Wno-deprecated-declarations -o socket_client2 client2/*.c *.c -Iclient2 -lpthread -lm ; then
-      echo -e "\n*******************Compiling server2...*******************"
-      if gcc -Wall -Wno-deprecated-declarations -o socket_server2 server2/*.c *.c -Iserver2 -lpthread -lm ; then
-	echo -e "\n*******************Launching server2...*******************"
-	shift # http://lglinux.blogspot.it/2008/10/removing-bash-arguments.html
-	./socket_server2 "$@"
+    if [ "$twoServers" = true ] ; then
+      serverName="server2"
+    else
+      serverName="server"
+    fi
+    
+    echo -e "\n\n*******************Compiling $clientName...*******************"
+    if gcc -Wall -Wno-deprecated-declarations -o socket_$clientName $clientName/*.c *.c -I$clientName -lpthread -lm ; then
+      echo -e "\n\n*******************Compiling $serverName...*******************"
+      if gcc -Wall -Wno-deprecated-declarations -o socket_$serverName $serverName/*.c *.c -I$serverName -lpthread -lm ; then
+	echo -e "\n\n*******************Launching $serverName...*******************"
+	shift
+	./socket_$serverName "$@"
       fi
     fi
     ;;
@@ -95,36 +101,28 @@ case $1 in
       rm "types.c"
     fi
       
-    echo -e "\n*******************Zipping...*******************"
-    if [ -f $zipDir"socket.zip" ] ; then
-      rm $zipDir"socket.zip"
-    fi
-    zip $zipDir"socket.zip" client/*.c client/*.h server/*.c server/*.h *.c *.h
-    
+    echo -e "\n\n*******************Zipping...*******************"
     cd $zipDir
-    echo -e "\n*******************Launching tests...*******************"
-    bash "./test.sh"
-    ;;
-   
-   
-  "test12")
-    
-    if [ -f "types.h" ] ; then
-      rm "types.h"
+    if [ -f "socket.zip" ] ; then
+      rm "socket.zip"
     fi
     
-    if [ -f "types.c" ] ; then
-      rm "types.c"
-    fi
+    if [ "$twoServers" = false ] ; then
+      if [ "$twoClients" = false ] ; then
+        zip "socket.zip" "$srcZipPath"client/*.c "$srcZipPath"client/*.h "$srcZipPath"server/*.c "$srcZipPath"server/*.h "$srcZipPath"*.c "$srcZipPath"*.h
+      else # twoClients = true
+        zip "socket.zip" "$srcZipPath"client1/*.c "$srcZipPath"client1/*.h "$srcZipPath"client2/*.c "$srcZipPath"client2/*.h "$srcZipPath"server/*.c "$srcZipPath"server/*.h "$srcZipPath"*.c "$srcZipPath"*.h
+      fi
       
-    echo -e "\n*******************Zipping...*******************"
-    if [ -f $zipDir"socket.zip" ] ; then
-      rm $zipDir"socket.zip"
+    else # twoServers = true
+      if [ "$twoClients" = false ] ; then
+        zip "socket.zip" "$srcZipPath"client/*.c "$srcZipPath"client/*.h "$srcZipPath"server1/*.c "$srcZipPath"server1/*.h "$srcZipPath"server2/*.c "$srcZipPath"server2/*.h "$srcZipPath"*.c "$srcZipPath"*.h
+      else # twoClients = true
+        zip "socket.zip" "$srcZipPath"client1/*.c "$srcZipPath"client1/*.h "$srcZipPath"client2/*.c "$srcZipPath"client2/*.h "$srcZipPath"server1/*.c "$srcZipPath"server1/*.h "$srcZipPath"server2/*.c "$srcZipPath"server2/*.h "$srcZipPath"*.c "$srcZipPath"*.h
+      fi
     fi
-    zip $zipDir"socket.zip" client1/*.c client1/*.h server1/*.c server1/*.h client2/*.c client2/*.h server2/*.c server2/*.h *.c *.h
     
-    cd $zipDir
-    echo -e "\n*******************Launching tests12...*******************"
+    echo -e "\n\n*******************Launching tests...*******************"
     bash "./test.sh"
     ;;
     
