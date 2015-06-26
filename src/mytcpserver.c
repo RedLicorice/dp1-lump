@@ -169,7 +169,7 @@ static void tcpServerOCPC(SOCKET sockfd, myTcpServerChildTask childTask, bool re
   while (1) {
     
     printf("\n");
-    myWarning("Server on listening...  [%d children]", "tcpServerOCPC", numChildren_ocpc);
+    myWarning("Server on listening...  [%d children]", "tcpServerOCPC", numChildren_ocpc + numChildren_preforked);
     
     sockfd_copy = myTcpServerAccept(sockfd, &clientAddr);
     myWarning("Connection accepted", "tcpServerOCPC");
@@ -180,11 +180,10 @@ static void tcpServerOCPC(SOCKET sockfd, myTcpServerChildTask childTask, bool re
     
     if (childpid == 0) {
       // child
-      Close(sockfd);
-      
       if (resetSigInt == true && signal(SIGINT, SIG_DFL) == SIG_ERR)
 	mySystemError("signal", "tcpServerOCPC");
       
+      Close(sockfd);
       childTask(sockfd_copy);
       Close(sockfd_copy);
       return;
@@ -202,28 +201,31 @@ static void tcpServerOCPCMax(SOCKET sockfd, int maxChildCount, myTcpServerChildT
   pid_t childpid;
   SOCKET sockfd_copy;
   struct sockaddr_in clientAddr;
-  sigset_t new_mask, old_mask;
-  
-  sigemptyset(&new_mask);
-  sigaddset(&new_mask, SIGCHLD);
+  sigset_t mask;
   
   if (signal(SIGCHLD, sigchldHandler) == SIG_ERR)
     mySystemError("signal", "tcpServerOCPCMax");
   
   while (1) {
+    // To avoid race-condition
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGCHLD);
+    Sigprocmask(SIG_BLOCK, &mask, NULL); 
     
     if (numChildren_ocpc == maxChildCount) {
-      Sigprocmask(SIG_BLOCK, &new_mask, &old_mask);
-      waitForZombieChildren();
-      
-      myWarning("Server on waiting for a client to terminate...  [%d children]", "tcpServerOCPCMax", numChildren_ocpc); // numChildren_ocpc = 3
-      if (wait(NULL) == -1)
+      myWarning("Server on waiting for a client to terminate...  [%d children]", "tcpServerOCPCMax", numChildren_ocpc + numChildren_preforked); // numChildren_ocpc = 3
+      if ((childpid = wait(NULL)) == -1)
 	mySystemError("wait", "tcpServerOCPCMax");
-      Sigprocmask(SIG_BLOCK, &old_mask, NULL);
+      numChildren_ocpc--;
+      myWarning("Child %d was zombie  [%d children]", "tcpServerOCPCMax", childpid, numChildren_ocpc + numChildren_preforked);
     }
+    // Re-enable the reception of the SIGCHLD signal
+    sigemptyset(&mask); 
+    sigaddset(&mask, SIGCHLD);
+    Sigprocmask(SIG_UNBLOCK, &mask, NULL); 
     
     printf("\n");
-    myWarning("Server on listening...  [%d children]", "tcpServerOCPCMax", numChildren_ocpc);
+    myWarning("Server on listening...  [%d children]", "tcpServerOCPCMax", numChildren_ocpc + numChildren_preforked);
     
     sockfd_copy = myTcpServerAccept(sockfd, &clientAddr);
     myWarning("Connection accepted", "tcpServerOCPCMax");
@@ -234,11 +236,10 @@ static void tcpServerOCPCMax(SOCKET sockfd, int maxChildCount, myTcpServerChildT
     
     if (childpid == 0) {
       // child
-      Close(sockfd);
-      
       if (resetSigInt == true && signal(SIGINT, SIG_DFL) == SIG_ERR)
 	mySystemError("signal", "tcpServerOCPCMax");
       
+      Close(sockfd);
       childTask(sockfd_copy);
       Close(sockfd_copy);
       return;
@@ -255,25 +256,23 @@ static void tcpServerOCPCMax(SOCKET sockfd, int maxChildCount, myTcpServerChildT
 static void waitForZombieChildren() {
   pid_t childpid;
   
-  childpid = waitpid(-1, NULL, WNOHANG);
-  while (childpid > 0) {
-    myWarning("Child %d was zombie  [%d children]", "waitForZombieChildren", childpid, numChildren_ocpc);
-    childpid = waitpid(-1, NULL, WNOHANG);
+  while ((childpid = waitpid(-1, NULL, WNOHANG)) > 0) {
+    numChildren_ocpc--;
+    myWarning("Child %d was zombie  [%d children]", "waitForZombieChildren", childpid, numChildren_ocpc + numChildren_preforked);
   }
     
   if (childpid == -1) {
     if (errno == 10) // No child processes
-      myWarning("Now there are no children  [%d children]", "waitForZombieChildren", numChildren_ocpc);
+      myWarning("Now there are no children", "waitForZombieChildren");
     else
       mySystemError("waitpid", "waitForZombieChildren");
       
   } else // childpid = 0
-    myWarning("Now there are no zombie children  [%d children]", "waitForZombieChildren", numChildren_ocpc);
+    myWarning("Now there are no zombie children  [%d children]", "waitForZombieChildren", numChildren_ocpc + numChildren_preforked);
 }
 
 static void sigchldHandler(int s) {
   if (s == SIGCHLD) {
-    numChildren_ocpc--;
     myWarning("Received SIGCHLD signal  [%d children]", "sigchldHandler", numChildren_ocpc);
     waitForZombieChildren();
   }
@@ -285,10 +284,14 @@ static void sigintHandler(int s) {
     myWarning("Received SIGINT signal", "sigintHandler");
     
     for (i = 0; i < numChildren_preforked; ++i)
-      kill(childpids[i], SIGINT);
+      kill(childpids[i], SIGTERM);
     
-    for (i = 0; i < numChildren_preforked; ++i)
-      waitpid(childpids[i], NULL, 0);
+    // for (i = 0; i < numChildren_preforked; ++i)
+      // waitpid(childpids[i], NULL, 0);
+    while (wait(NULL) > 0);
+
+    if (errno != ECHILD)
+      mySystemError("wait", "sigintHandler");
     
     exit(0);
   }
