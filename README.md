@@ -6,7 +6,7 @@
     
     or at Labinf:
 
-        cp "config/config labinf.h" src/
+        cp "config/config labinf.h" src/config.h
 
 
 2. Check that the library works:
@@ -41,7 +41,7 @@ You only need folder `src`.
 
 1. Make sure you have the `config.h` file for Labinf computers:
 
-        cp "config/config labinf.h" src/
+        cp "config/config labinf.h" src/config.h
 
 2. If the exam is not about XDR, you have to use the `script-noxdr.sh` script:
 
